@@ -1,0 +1,3 @@
+displayName = Make Debuffs Great Again
+author = Lacewing
+version = 0.1
