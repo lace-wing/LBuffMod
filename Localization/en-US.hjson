@@ -1,0 +1,10 @@
+﻿Mods:
+{
+	LBuffMod:
+	{
+		ItemName:
+		{
+			AcidicSword : "Acidic Sword"
+		}
+	}
+}

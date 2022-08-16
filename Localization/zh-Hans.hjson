@@ -1,0 +1,10 @@
+﻿Mods:
+{
+	LBuffMod:
+	{
+		ItemName:
+		{
+			AcidicSword : "酸性的剑"
+		}
+	}
+}
