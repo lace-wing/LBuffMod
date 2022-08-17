@@ -16,9 +16,17 @@ namespace LBuffMod.Common.GlobalNPCs
                 //根据持续时间增加伤害
                 if (buffType == LBuffUtilities.GetAllElements(LBuffUtilities.damagingDebuffsToBuff))
                 {
-                    int additionalDamage = (int)(LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.GetAllElements(LBuffUtilities.damagingDebuffsToBuff)) * Math.Clamp(npc.buffTime[buffType] / 7200, 1, 5) * 0.6f);
+                    int additionalDamage = (int)(LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.GetAllElements(LBuffUtilities.damagingDebuffsToBuff)) * Math.Clamp(npc.buffTime[buffType] / 3600, 1, 7) * 0.6f - 1);
                     npc.lifeRegen += additionalDamage;
                     damage += additionalDamage;
+                }
+            }
+            if (buffType == BuffID.Bleeding)
+            {
+                npc.lifeRegen -= 6;
+                if (npc.lifeRegen > 0)
+                {
+                    npc.lifeRegen = 0;
                 }
             }
         }
@@ -34,11 +42,13 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            if (npc.HasBuff(BuffID.OnFire))
+            if (npc.HasBuff(LBuffUtilities.GetAllElements(LBuffUtilities.thermalDebuffs)))
             {
                 if (!crit)
                 {
-                    crit = Main.rand.Next(1, 100) > 80 ? true : false;
+                    int c = 100 - Math.Max(LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.GetAllElements(LBuffUtilities.thermalDebuffs)), 40);
+                    crit = Main.rand.Next(1, 100) > c ? true : false;
+                    Main.NewText(c);
                 }
             }
         }
@@ -47,6 +57,10 @@ namespace LBuffMod.Common.GlobalNPCs
             if (npc.HasBuff(LBuffUtilities.GetAllElements(LBuffUtilities.damagingDebuffsToBuff)))
             {
                 npc.velocity *= 0.95f;
+            }
+            if (npc.type == NPCID.BrainofCthulhu)
+            {
+                npc.AddBuff(BuffID.Bleeding, 6);
             }
         }
     }

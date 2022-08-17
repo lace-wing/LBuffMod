@@ -13,7 +13,7 @@ namespace LBuffMod.Items
 
 		public override void SetDefaults()
 		{
-			Item.damage = 50;
+			Item.damage = 10;
 			Item.DamageType = DamageClass.Melee;
 			Item.width = 40;
 			Item.height = 40;
@@ -22,9 +22,14 @@ namespace LBuffMod.Items
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 6;
 			Item.value = 10000;
-			Item.rare = 2;
+			Item.rare = ItemRarityID.Green;
 			Item.UseSound = SoundID.Item1;
 			Item.autoReuse = true;
 		}
-	}
+        public override void OnHitNPC(Player player, NPC target, int damage, float knockBack, bool crit)
+        {
+			target.AddBuff(BuffID.OnFire, 600);
+			target.AddBuff(BuffID.Burning, 600);
+        }
+    }
 }
