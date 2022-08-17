@@ -2,7 +2,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace LBuffMod.Items
+namespace LBuffMod.Content.Items
 {
 	public class AcidicSword : ModItem
 	{
@@ -15,6 +15,7 @@ namespace LBuffMod.Items
 		{
 			Item.damage = 10;
 			Item.DamageType = DamageClass.Melee;
+			Item.crit = -100;
 			Item.width = 40;
 			Item.height = 40;
 			Item.useTime = 20;
@@ -28,8 +29,7 @@ namespace LBuffMod.Items
 		}
         public override void OnHitNPC(Player player, NPC target, int damage, float knockBack, bool crit)
         {
-			target.AddBuff(BuffID.OnFire, 600);
-			target.AddBuff(BuffID.Burning, 600);
+			target.AddBuff(BuffID.CursedInferno, 60);
         }
     }
 }

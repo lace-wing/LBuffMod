@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 
 namespace LBuffMod.Common.GlobalNPCs
 {
@@ -10,18 +11,22 @@ namespace LBuffMod.Common.GlobalNPCs
     {
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
-            int buffType = LBuffUtilities.GetAllElements(npc.buffType);
             if (npc.lifeRegen < 0)
             {
                 //根据持续时间增加伤害
-                if (buffType == LBuffUtilities.GetAllElements(LBuffUtilities.damagingDebuffsToBuff))
+                for (int i = 0; i < LBuffUtilities.damagingDebuffsToBuff.Length; i++)
                 {
-                    int additionalDamage = (int)(LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.GetAllElements(LBuffUtilities.damagingDebuffsToBuff)) * Math.Clamp(npc.buffTime[buffType] / 3600, 1, 7) * 0.6f - 1);
-                    npc.lifeRegen += additionalDamage;
-                    damage += additionalDamage;
+                    int buffIndex = npc.FindBuffIndex(LBuffUtilities.damagingDebuffsToBuff[i]);
+                    if (buffIndex != -1)//TODO Balanced formula needed
+                    {
+                        int additionalDamage = (int)(LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.damagingDebuffsToBuff[i]) * (Math.Clamp(npc.buffTime[buffIndex] / 3600, 1, 7) - 1.6f));
+                        npc.lifeRegen += additionalDamage;
+                        damage -= additionalDamage / 2;
+                        Main.NewText("Debuff dps: " + damage + " " + "Additional damage: " + additionalDamage);
+                    }
                 }
             }
-            if (buffType == BuffID.Bleeding)
+            if (npc.HasBuff(BuffID.Bleeding))
             {
                 npc.lifeRegen -= 6;
                 if (npc.lifeRegen > 0)
@@ -32,29 +37,33 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void ModifyHitByItem(NPC npc, Player player, Item item, ref int damage, ref float knockback, ref bool crit)
         {
-            if (npc.HasBuff(BuffID.OnFire))
+            for (int i = 0; i < LBuffUtilities.thermalDebuffs.Length; i++)
             {
-                if (!crit)
+                int buffIndex = npc.FindBuffIndex(LBuffUtilities.thermalDebuffs[i]);
+                if (buffIndex != -1)
                 {
-                    crit = Main.rand.Next(1, 100) > 90 ? true : false;
+                    int c = (-LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.thermalDebuffs[i]));
+                    crit = Main.rand.Next(1, 100) < c ? true : false;
+                    Main.NewText("Additional crit chance: " + c);
                 }
             }
         }
         public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            if (npc.HasBuff(LBuffUtilities.GetAllElements(LBuffUtilities.thermalDebuffs)))
+            for (int i = 0; i < LBuffUtilities.thermalDebuffs.Length; i++)
             {
-                if (!crit)
+                int buffIndex = npc.FindBuffIndex(LBuffUtilities.thermalDebuffs[i]);
+                if (buffIndex != -1)
                 {
-                    int c = 100 - Math.Max(LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.GetAllElements(LBuffUtilities.thermalDebuffs)), 40);
-                    crit = Main.rand.Next(1, 100) > c ? true : false;
-                    Main.NewText(c);
+                    int c = (-LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.thermalDebuffs[i]));
+                    crit = Main.rand.Next(1, 100) < c ? true : false;
+                    Main.NewText("Additional Crit: " + c);
                 }
             }
         }
         public override void PostAI(NPC npc)
         {
-            if (npc.HasBuff(LBuffUtilities.GetAllElements(LBuffUtilities.damagingDebuffsToBuff)))
+            if (LBuffUtilities.NPCHasBuffInBuffSet(npc, LBuffUtilities.thermalDebuffs))
             {
                 npc.velocity *= 0.95f;
             }

@@ -11,14 +11,16 @@ namespace LBuffMod.Common.GlobalBuffs
     {
         public override bool ReApply(int type, NPC npc, int time, int buffIndex)
         {
-            if (type == LBuffUtilities.GetAllElements(LBuffUtilities.damagingDebuffsToBuff))
+            for (int i = 0; i < LBuffUtilities.damagingDebuffsToBuff.Length; i++)
             {
-                //若不足12分钟则叠加持续时间
-                if (npc.buffTime[type] < 43200)
+                if (type == LBuffUtilities.damagingDebuffsToBuff[i])
                 {
-                    Main.NewText(type);
-                    npc.buffTime[type] += time;
-                    return true;
+                    //若不足12分钟则叠加持续时间
+                    if (npc.buffTime[buffIndex] < 43200)
+                    {
+                        npc.buffTime[buffIndex] += time;
+                        return true;
+                    }
                 }
             }
             return base.ReApply(type, npc, time, buffIndex);

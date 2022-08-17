@@ -8,11 +8,12 @@ namespace LBuffMod.Common.Utilities
 {
     public static class LBuffUtilities
     {
-        //所有要加强的debuff：着火了！、狱火、霜火、霜噬、诅咒焰、暗影焰、日耀、中毒、毒液、带电
+        //所有要加强的debuff：着火了！、狱火、霜火、霜噬、诅咒焰、暗影焰、日耀、中毒、毒液、带电、流血
         public static int[] damagingDebuffsToBuff =
         {
             BuffID.OnFire, BuffID.OnFire3, BuffID.Frostburn, BuffID.Frostburn2, BuffID.CursedInferno,
-            BuffID.ShadowFlame, BuffID.Daybreak, BuffID.Poisoned, BuffID.Venom, BuffID.Electrified
+            BuffID.ShadowFlame, BuffID.Daybreak, BuffID.Poisoned, BuffID.Venom, BuffID.Electrified,
+            BuffID.Bleeding
         };
         //热能debuff：着火了！、狱火、霜火、霜噬、诅咒焰、暗影焰、日耀、灼烧
         public static int[] thermalDebuffs =
@@ -25,14 +26,27 @@ namespace LBuffMod.Common.Utilities
         {
             BuffID.Poisoned, BuffID.Venom
         };
-        public static int GetAllElements(int[] intArray)
+        public static bool NPCHasBuffInBuffSet(NPC npc, int[] buffSet)
         {
-            int element = 0;
-            for (int i = 0; i < intArray.Length; i++)
+            for (int i = 0; i < buffSet.Length; i++)
             {
-                element = intArray[i];
+                if (npc.HasBuff(buffSet[i]))
+                {
+                    return true;
+                }
             }
-            return element;
+            return false;
+        }
+        public static bool PlayerHasBuffInBuffSet(Player player, int[] buffSet)
+        {
+            for (int i = 0; i < buffSet.Length; i++)
+            {
+                if (player.HasBuff(buffSet[i]))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         public static int BuffIDToLifeRegen(int buffID)
         {
