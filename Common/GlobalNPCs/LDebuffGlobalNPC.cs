@@ -22,7 +22,7 @@ namespace LBuffMod.Common.GlobalNPCs
                         int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.9f, 4f, npc.buffTime[buffIndex] / 43200f));
                         npc.lifeRegen += additionalDamage;
                         damage -= additionalDamage / 2;
-                        Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
+                        //Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
                     }
                 }
             }
