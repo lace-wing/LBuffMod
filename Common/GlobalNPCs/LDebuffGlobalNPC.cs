@@ -19,7 +19,7 @@ namespace LBuffMod.Common.GlobalNPCs
                     int buffIndex = npc.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
                     if (buffIndex != -1)//TODO Balanced formula needed
                     {
-                        int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.9f, 6.9f, npc.buffTime[buffIndex] / 43200));
+                        int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.9f, 3.9f, npc.buffTime[buffIndex] / 21600f));
                         npc.lifeRegen += additionalDamage;
                         damage -= additionalDamage / 2;
                         Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
@@ -53,7 +53,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 {
                     if (crit && npc.buffTime[buffIndex] >= 1200)//超过20秒时暴击则按系数*时长增伤，时长减少至1/15
                     {
-                        damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 19.4f, npc.buffTime[buffIndex] / 43200));
+                        damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 19.4f, npc.buffTime[buffIndex] / 21600));
                         damage = (int)Math.Pow(damage, 5 / 3);
                         npc.buffTime[buffIndex] /= 15;
                     }
@@ -78,7 +78,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 {
                     if (crit && npc.buffTime[buffIndex] >= 1200)//超过20秒时暴击则按系数*时长增伤，时长减少至1/15
                     {
-                        damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 19.4f, npc.buffTime[buffIndex] / 43200));
+                        damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 19.4f, npc.buffTime[buffIndex] / 21600));
                         damage = (int)Math.Pow(damage, 5 / 3);
                         npc.buffTime[buffIndex] /= 15;
                     }
@@ -94,6 +94,43 @@ namespace LBuffMod.Common.GlobalNPCs
             if (npc.type == NPCID.BrainofCthulhu)
             {
                 npc.AddBuff(BuffID.Bleeding, 6);
+            }
+        }
+        public override void OnHitPlayer(NPC npc, Player target, int damage, bool crit)
+        {
+            //世吞、大中小噬魂怪、腐化者近战
+            if (npc.type == NPCID.EaterofWorldsBody || npc.type == NPCID.EaterofWorldsHead || npc.type == NPCID.EaterofWorldsTail || npc.type == NPCID.EaterofSouls || npc.type == NPCID.BigEater || npc.type == NPCID.LittleEater || npc.type == NPCID.Corruptor)
+            {
+                if (!Main.hardMode)
+                {
+                    target.AddBuff(BuffID.OnFire, 48);//96 in expert world, 120 in master world
+                }
+                if (Main.hardMode)
+                {
+                    target.AddBuff(BuffID.CursedInferno, 96);
+                }
+            }
+            //血肉墙、饿鬼、血蛭的近战
+            if (npc.type == NPCID.TheHungry || npc.type == NPCID.TheHungryII || npc.type == NPCID.WallofFlesh || npc.type == NPCID.WallofFleshEye || npc.type == NPCID.LeechHead || npc.type == NPCID.LeechBody || npc.type == NPCID.LeechTail)
+            {
+                if (!Main.hardMode)
+                {
+                    target.AddBuff(BuffID.OnFire3, 120);
+                }
+                if (Main.hardMode)
+                {
+                    target.AddBuff(BuffID.CursedInferno, 120);
+                }
+            }
+            //机械骷髅王、激光眼近战
+            if (npc.type == NPCID.SkeletronPrime || npc.type == NPCID.PrimeCannon || npc.type == NPCID.PrimeLaser || npc.type == NPCID.PrimeSaw || npc.type == NPCID.PrimeVice || npc.type == NPCID.Retinazer)
+            {
+                target.AddBuff(BuffID.CursedInferno, 120);
+            }
+            //魔焰眼近战
+            if (npc.type == NPCID.Spazmatism)
+            {
+                target.AddBuff(BuffID.CursedInferno, 240);
             }
         }
     }

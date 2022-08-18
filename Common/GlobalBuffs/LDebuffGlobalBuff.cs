@@ -25,5 +25,21 @@ namespace LBuffMod.Common.GlobalBuffs
             }
             return base.ReApply(type, npc, time, buffIndex);
         }
+        public override bool ReApply(int type, Player player, int time, int buffIndex)
+        {
+            for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+            {
+                if (type == LBuffUtils.lDamagingDebuffs[i])
+                {
+                    //若不足12分钟则叠加持续时间
+                    if (player.buffTime[buffIndex] < 43200)
+                    {
+                        player.buffTime[buffIndex] += time;
+                        return true;
+                    }
+                }
+            }
+            return base.ReApply(type, player, time, buffIndex);
+        }
     }
 }
