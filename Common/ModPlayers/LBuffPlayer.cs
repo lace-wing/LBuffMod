@@ -19,7 +19,7 @@ namespace LBuffMod.Common.ModPlayers
                     int buffIndex = Player.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
                     if (buffIndex != -1)//TODO Balanced formula needed
                     {
-                        int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.1f, 3.1f, Player.buffTime[buffIndex] / 10800f));
+                        int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.1f, 3f, Player.buffTime[buffIndex] / 43200f));
                         Player.lifeRegen += additionalDamage;
                         Main.NewText("Player: buffTime: " + Player.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
                     }
@@ -34,13 +34,6 @@ namespace LBuffMod.Common.ModPlayers
                 }
             }
         }
-        public override void PostUpdate()
-        {
-            if (LBuffUtils.PlayerHasBuffInBuffSet(Player, LBuffUtils.damagingDebuffsToBuff))
-            {
-                Player.velocity *= 0.95f;
-            }
-        }
         public override void ModifyHitByNPC(NPC npc, ref int damage, ref bool crit)
         {
             for (int i = 0; i < LBuffUtils.damagingDebuffsToBuff.Length; i++)
@@ -49,7 +42,7 @@ namespace LBuffMod.Common.ModPlayers
                 if (buffIndex != -1)
                 {
                     //弱debuff通用增伤
-                    damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 5400));
+                    damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 21600));
                 }
             }
             for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
@@ -58,10 +51,12 @@ namespace LBuffMod.Common.ModPlayers
                 if (buffIndex != -1)
                 {
                     //火系debuff产生额外被暴击率
-                    int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) / 4;
-                    crit = Main.rand.Next(1, 100) < c ? true : false;
+                    if (!crit)
+                    {
+                        int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) / 4;
+                        crit = Main.rand.Next(1, 100) < c ? true : false;
+                    }
                 }
-
             }
         }
         public override void ModifyHitByProjectile(Projectile proj, ref int damage, ref bool crit)
@@ -72,7 +67,7 @@ namespace LBuffMod.Common.ModPlayers
                 if (buffIndex != -1)
                 {
                     //弱debuff通用增伤
-                    damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 5400));
+                    damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 21600));
                 }
             }
             for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
@@ -81,8 +76,11 @@ namespace LBuffMod.Common.ModPlayers
                 if (buffIndex != -1)
                 {
                     //火系debuff产生额外被暴击率
-                    int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) / 4;
-                    crit = Main.rand.Next(1, 100) < c ? true : false;
+                    if (!crit)
+                    {
+                        int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) / 4;
+                        crit = Main.rand.Next(1, 100) < c ? true : false;
+                    }
                 }
 
             }
