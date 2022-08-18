@@ -11,9 +11,9 @@ namespace LBuffMod.Common.GlobalBuffs
     {
         public override bool ReApply(int type, NPC npc, int time, int buffIndex)
         {
-            for (int i = 0; i < LBuffUtilities.damagingDebuffsToBuff.Length; i++)
+            for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
             {
-                if (type == LBuffUtilities.damagingDebuffsToBuff[i])
+                if (type == LBuffUtils.lDamagingDebuffs[i])
                 {
                     //若不足12分钟则叠加持续时间
                     if (npc.buffTime[buffIndex] < 43200)

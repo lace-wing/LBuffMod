@@ -13,16 +13,16 @@ namespace LBuffMod.Common.GlobalNPCs
         {
             if (npc.lifeRegen < 0)
             {
-                //根据持续时间增加伤害
-                for (int i = 0; i < LBuffUtilities.damagingDebuffsToBuff.Length; i++)
+                //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
+                for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
                 {
-                    int buffIndex = npc.FindBuffIndex(LBuffUtilities.damagingDebuffsToBuff[i]);
+                    int buffIndex = npc.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
                     if (buffIndex != -1)//TODO Balanced formula needed
                     {
-                        int additionalDamage = (int)(LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.damagingDebuffsToBuff[i]) * (Math.Clamp(npc.buffTime[buffIndex] / 3600, 1, 7) - 1.6f));
+                        int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.9f, 6.9f, npc.buffTime[buffIndex] / 43200));
                         npc.lifeRegen += additionalDamage;
                         damage -= additionalDamage / 2;
-                        Main.NewText("Debuff dps: " + damage + " " + "Additional damage: " + additionalDamage);
+                        Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
                     }
                 }
             }
@@ -37,33 +37,57 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void ModifyHitByItem(NPC npc, Player player, Item item, ref int damage, ref float knockback, ref bool crit)
         {
-            for (int i = 0; i < LBuffUtilities.thermalDebuffs.Length; i++)
+            for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
             {
-                int buffIndex = npc.FindBuffIndex(LBuffUtilities.thermalDebuffs[i]);
+                int buffIndex = npc.FindBuffIndex(LBuffUtils.thermalDebuffs[i]);
+                if (buffIndex != -1)//有火系debuff则获得额外的被暴击率
+                {
+                    int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]);
+                    crit = Main.rand.Next(1, 100) < c ? true : false;
+                }
+            }
+            for (int i = 0; i < LBuffUtils.poisonousDebuffs.Length; i++)
+            {
+                int buffIndex = npc.FindBuffIndex(LBuffUtils.poisonousDebuffs[i]);
                 if (buffIndex != -1)
                 {
-                    int c = (-LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.thermalDebuffs[i]));
-                    crit = Main.rand.Next(1, 100) < c ? true : false;
-                    Main.NewText("Additional crit chance: " + c);
+                    if (crit && npc.buffTime[buffIndex] >= 1200)//超过20秒时暴击则按系数*时长增伤，时长减少至1/15
+                    {
+                        damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 19.4f, npc.buffTime[buffIndex] / 43200));
+                        damage = (int)Math.Pow(damage, 5 / 3);
+                        npc.buffTime[buffIndex] /= 15;
+                    }
                 }
             }
         }
         public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            for (int i = 0; i < LBuffUtilities.thermalDebuffs.Length; i++)
+            for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
             {
-                int buffIndex = npc.FindBuffIndex(LBuffUtilities.thermalDebuffs[i]);
+                int buffIndex = npc.FindBuffIndex(LBuffUtils.thermalDebuffs[i]);
                 if (buffIndex != -1)
                 {
-                    int c = (-LBuffUtilities.BuffIDToLifeRegen(LBuffUtilities.thermalDebuffs[i]));
+                    int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) - 6;//Lower add-crit chance
                     crit = Main.rand.Next(1, 100) < c ? true : false;
-                    Main.NewText("Additional Crit: " + c);
+                }
+            }
+            for (int i = 0; i < LBuffUtils.poisonousDebuffs.Length; i++)
+            {
+                int buffIndex = npc.FindBuffIndex(LBuffUtils.poisonousDebuffs[i]);
+                if (buffIndex != -1)
+                {
+                    if (crit && npc.buffTime[buffIndex] >= 1200)//超过20秒时暴击则按系数*时长增伤，时长减少至1/15
+                    {
+                        damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 19.4f, npc.buffTime[buffIndex] / 43200));
+                        damage = (int)Math.Pow(damage, 5 / 3);
+                        npc.buffTime[buffIndex] /= 15;
+                    }
                 }
             }
         }
         public override void PostAI(NPC npc)
         {
-            if (LBuffUtilities.NPCHasBuffInBuffSet(npc, LBuffUtilities.thermalDebuffs))
+            if (LBuffUtils.NPCHasBuffInBuffSet(npc, LBuffUtils.thermalDebuffs))
             {
                 npc.velocity *= 0.95f;
             }
