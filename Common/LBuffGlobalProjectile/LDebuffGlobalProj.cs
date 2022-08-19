@@ -3,27 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria.DataStructures;
 
 namespace LBuffMod.Common.LBuffGlobalProjectile
 {
     public class LDebuffGlobalProj : GlobalProjectile
     {
-        public override void OnHitPlayer(Projectile projectile, Player target, int damage, bool crit)
+        public static NPC npc;
+        public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
-            NPC npc = Main.npc[projectile.owner];
-            #region Pre-hard Mode projs inflicting damaging debuffs
-            //世吞、大中小噬魂怪、腐化者
-            if (npc.type == NPCID.EaterofWorldsBody || npc.type == NPCID.EaterofWorldsHead || npc.type == NPCID.EaterofWorldsTail || npc.type == NPCID.EaterofSouls || npc.type == NPCID.BigEater || npc.type == NPCID.LittleEater || npc.type == NPCID.Corruptor)
+            if (source is EntitySource_Parent)
             {
-                if (!Main.hardMode)
+                EntitySource_Parent source_Parent = source as EntitySource_Parent;
+                if (source_Parent.Entity is NPC)
                 {
-                    target.AddBuff(BuffID.OnFire, 48);//96 in expert world, 120 in master world
-                }
-                if (Main.hardMode)
-                {
-                    target.AddBuff(BuffID.CursedInferno, 48);
+                    npc = (NPC)source_Parent.Entity;
                 }
             }
+        }
+        public override void OnHitPlayer(Projectile projectile, Player target, int damage, bool crit)
+        {
+            //NPC npc = Main.npc[projectile.owner];
+            Main.NewText(npc);
+            #region Pre-hard Mode projs inflicting damaging debuffs
             //哥布林鲨、血鱿鱼、恐惧鹦鹉螺
             if (npc.type == NPCID.GoblinShark || npc.type == NPCID.BloodSquid || npc.type == NPCID.BloodNautilus)
             {

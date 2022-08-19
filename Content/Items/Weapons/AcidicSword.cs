@@ -29,7 +29,19 @@ namespace LBuffMod.Content.Items.Weapons
         }
         public override void OnHitNPC(Player player, NPC target, int damage, float knockBack, bool crit)
         {
-            target.AddBuff(BuffID.CursedInferno, 60);
+            target.AddBuff(BuffID.Electrified, 600);
+        }
+        public override bool AltFunctionUse(Player player)
+        {
+            return true;
+        }
+        public override bool CanUseItem(Player player)
+        {
+            if (AltFunctionUse(player))
+            {
+                player.AddBuff(BuffID.Electrified, 600);
+            }
+            return base.CanUseItem(player);
         }
     }
 }

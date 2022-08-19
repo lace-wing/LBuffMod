@@ -22,7 +22,7 @@ namespace LBuffMod.Common.GlobalItems
             }
             if (item.type == ItemID.SweetheartNecklace)
             {
-                player.GetModPlayer<LDebuffPlayer>().sweetheartNecklaceBleedingAndPoison = true;
+                player.GetModPlayer<LDebuffPlayer>().stingerNecklaceBleedingAndPoison = true;
             }
         }
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
@@ -35,9 +35,9 @@ namespace LBuffMod.Common.GlobalItems
             {
                 tooltips.Add(new(Mod, "SharkToothNecklaceBleedingTooltip", Language.GetTextValue("Mods.LBuffMod.TooltipLines.SharkToothNecklaceBleedingTooltip")));
             }
-            if (item.type == ItemID.SharkToothNecklace)
+            if (item.type == ItemID.StingerNecklace)
             {
-                tooltips.Add(new(Mod, "SweetheartNecklaceBleedingAndPoisonTooltip", Language.GetTextValue("Mods.LBuffMod.TooltipLines.SweetheartNecklaceBleedingAndPoisonTooltip")));
+                tooltips.Add(new(Mod, "StingerNecklaceBleedingAndPoisonTooltip", Language.GetTextValue("Mods.LBuffMod.TooltipLines.StingerNecklaceBleedingAndPoisonTooltip")));
             }
         }
     }

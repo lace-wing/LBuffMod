@@ -21,7 +21,7 @@ namespace LBuffMod.Common.GlobalNPCs
                     int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.9f, 4f, npc.buffTime[buffIndex] / 43200f));
                     npc.lifeRegen += additionalDamage;
                     damage -= additionalDamage / 2;
-                    Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage + " lifeRegen: " + npc.lifeRegen);
+                    //Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage + " lifeRegen: " + npc.lifeRegen);
                 }
             }
             //流血真的流血了
@@ -36,18 +36,21 @@ namespace LBuffMod.Common.GlobalNPCs
             //带电真的根据速度掉血了
             if (npc.HasBuff(BuffID.Electrified))
             {
-                float f = Vector2.Distance(npc.velocity, Vector2.Zero) / 64;
-                npc.lifeRegen -= 8 + (f > 36 ? 36 : (int)f);
+                float f = Vector2.Distance(npc.velocity, Vector2.Zero) * 24;
+                npc.lifeRegen -= 8 + (f > 512 ? 512 : (int)f);
             }
             //皇家凝胶常规火焰增伤
             for (int i = 0; i < Main.player.Length; i++)
             {
-                if (Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelOnFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
+                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelOnFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
                 {
                     for (int j = 0; j < LBuffUtils.normalFireDebuffs.Length; j++)
                     {
-                        npc.lifeRegen += LDebuffPlayer.royalGelFireDamage;
-                        damage -= (int)(LDebuffPlayer.royalGelFireDamage / 2f);
+                        if (npc.HasBuff(LBuffUtils.normalFireDebuffs[j]))
+                        {
+                            npc.lifeRegen += LDebuffPlayer.royalGelFireDamage;
+                            damage -= (int)(LDebuffPlayer.royalGelFireDamage / 2f);
+                        }
                     }
                 }
             }
@@ -135,16 +138,24 @@ namespace LBuffMod.Common.GlobalNPCs
             //接触时触电，两者平分持续时间
             int npcElectrifiedIndex = npc.FindBuffIndex(BuffID.Electrified);
             int targetElectrifiedIndex = target.FindBuffIndex(BuffID.Electrified);
-            if (npcElectrifiedIndex != -1 || targetElectrifiedIndex != -1)
+            if (npcElectrifiedIndex != -1 && targetElectrifiedIndex != -1)
             {
-                int npcElectrifiedTime = npc.buffTime[npcElectrifiedIndex];
-                int targetElectrifiedTime = target.buffTime[targetElectrifiedIndex];
-                target.buffTime[targetElectrifiedIndex] = npc.buffTime[npcElectrifiedIndex] = (int)((targetElectrifiedTime + npcElectrifiedTime) * 0.5f);
+                npc.buffTime[npcElectrifiedIndex] = target.buffTime[targetElectrifiedIndex] = (int)((npc.buffTime[npcElectrifiedIndex] + target.buffTime[targetElectrifiedIndex]) * 0.5f);
+            }
+            if (targetElectrifiedIndex == -1 && npcElectrifiedIndex != -1)
+            {
+                npc.buffTime[npcElectrifiedIndex] = (int)((npc.buffTime[npcElectrifiedIndex]) * 0.5f);
+                target.AddBuff(BuffID.Electrified, (int)((npc.buffTime[npcElectrifiedIndex]) * 0.5f));
+            }
+            if (npcElectrifiedIndex == -1 && targetElectrifiedIndex != -1)
+            {
+                target.buffTime[targetElectrifiedIndex] = (int)((target.buffTime[targetElectrifiedIndex]) * 0.5f);
+                npc.AddBuff(BuffID.Electrified, (int)(target.buffTime[targetElectrifiedIndex] * 0.5f));
             }
             #endregion
             #region Pre-hard mode NPCs inflicting damaging debuffs
-            //世吞、大中小噬魂怪、腐化者近战
-            if (npc.type == NPCID.EaterofWorldsBody || npc.type == NPCID.EaterofWorldsHead || npc.type == NPCID.EaterofWorldsTail || npc.type == NPCID.EaterofSouls || npc.type == NPCID.BigEater || npc.type == NPCID.LittleEater || npc.type == NPCID.Corruptor)
+            //世吞、大中小噬魂怪、腐化者、世吞口水、腐化者口水近战
+            if (npc.type == NPCID.EaterofWorldsBody || npc.type == NPCID.EaterofWorldsHead || npc.type == NPCID.EaterofWorldsTail || npc.type == NPCID.EaterofSouls || npc.type == NPCID.BigEater || npc.type == NPCID.LittleEater || npc.type == NPCID.Corruptor || npc.type == NPCID.VileSpitEaterOfWorlds || npc.type == NPCID.VileSpit)
             {
                 if (!Main.hardMode)
                 {

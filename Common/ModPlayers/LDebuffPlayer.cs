@@ -12,12 +12,12 @@ namespace LBuffMod.Common.ModPlayers
         public bool royalGelOnFire = false;
         public static int royalGelFireDamage = -5;
         public bool sharkToothNecklaceBleeding = false;
-        public bool sweetheartNecklaceBleedingAndPoison = false;
+        public bool stingerNecklaceBleedingAndPoison = false;
         public override void ResetEffects()
         {
             royalGelOnFire = false;
             sharkToothNecklaceBleeding = false;
-            sweetheartNecklaceBleedingAndPoison = false;
+            stingerNecklaceBleedingAndPoison = false;
         }
         public override void UpdateEquips()
         {
@@ -53,12 +53,12 @@ namespace LBuffMod.Common.ModPlayers
             {
                 if (Player.velocity.X == 0 && (Player.controlLeft || Player.controlRight))
                 {
-                    Player.lifeRegen += 24;
+                    Player.lifeRegen += 32;
                 }
                 if (Player.velocity != Vector2.Zero && (Player.controlLeft || Player.controlRight || Player.controlJump))
                 {
-                    float f = Vector2.Distance(Player.velocity, Vector2.Zero) / 81;
-                    Player.lifeRegen -= f > 36 ? 36 : (int)f;
+                    float f = Vector2.Distance(Player.velocity, Vector2.Zero) / 144;
+                    Player.lifeRegen -= f > 4 ? 4 : (int)f;
                 }
             }
         }
@@ -137,7 +137,7 @@ namespace LBuffMod.Common.ModPlayers
                 target.AddBuff(BuffID.Bleeding, 120);
             }
             //甜心项链施加流血和中毒
-            if (sweetheartNecklaceBleedingAndPoison)
+            if (stingerNecklaceBleedingAndPoison)
             {
                 target.AddBuff(BuffID.Bleeding, 120);
                 target.AddBuff(BuffID.Poisoned, 60);
@@ -146,6 +146,7 @@ namespace LBuffMod.Common.ModPlayers
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
+            Main.NewText("NPC lifeRegen: " + target.lifeRegen);
             //血箭、血蛙、血蝠、血雨
             if (proj.type == ProjectileID.BloodArrow || proj.type == ProjectileID.VampireFrog || proj.type == ProjectileID.BatOfLight || proj.type == ProjectileID.BloodRain)
             {
@@ -167,7 +168,7 @@ namespace LBuffMod.Common.ModPlayers
                 target.AddBuff(BuffID.Bleeding, 60);
             }
             //甜心项链施加流血和中毒
-            if (sweetheartNecklaceBleedingAndPoison)
+            if (stingerNecklaceBleedingAndPoison)
             {
                 target.AddBuff(BuffID.Bleeding, 60);
                 target.AddBuff(BuffID.Poisoned, 60);
