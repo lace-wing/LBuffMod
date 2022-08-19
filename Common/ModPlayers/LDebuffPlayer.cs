@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LBuffMod.Common.ModPlayers
 {
-    public class LBuffPlayer : ModPlayer
+    public class LDebuffPlayer : ModPlayer
     {
         public override void UpdateBadLifeRegen()
         {
@@ -19,18 +19,32 @@ namespace LBuffMod.Common.ModPlayers
                     int buffIndex = Player.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
                     if (buffIndex != -1)//TODO Balanced formula needed
                     {
-                        int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.1f, 3f, Player.buffTime[buffIndex] / 43200f));
+                        int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.1f, 3f, Player.buffTime[buffIndex] / 6300f));
                         Player.lifeRegen += additionalDamage;
-                        Main.NewText("Player: buffTime: " + Player.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
+                        //Main.NewText("Player: buffTime: " + Player.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
                     }
                 }
             }
+            //流血真的流血了
             if (Player.HasBuff(BuffID.Bleeding))
             {
                 Player.lifeRegen -= 6;
                 if (Player.lifeRegen > 0)
                 {
                     Player.lifeRegen = 0;
+                }
+            }
+            //带电真的根据移动速度掉血了
+            if (Player.HasBuff(BuffID.Electrified))
+            {
+                if (Player.velocity.X == 0 && (Player.controlLeft || Player.controlRight))
+                {
+                    Player.lifeRegen += 24;
+                }
+                if (Player.velocity != Vector2.Zero && (Player.controlLeft || Player.controlRight || Player.controlJump))
+                {
+                    float f = Vector2.Distance(Player.velocity, Vector2.Zero) / 81;
+                    Player.lifeRegen -= f > 36 ? 36 : (int)f;
                 }
             }
         }

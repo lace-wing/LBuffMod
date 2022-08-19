@@ -23,7 +23,7 @@ namespace LBuffMod.Common.Utilities
             BuffID.BoneJavelin, BuffID.Suffocation, BuffID.DryadsWardDebuff, BuffID.TheTongue, BuffID.Burning,
             BuffID.Bleeding
         };
-        //所有要加强的debuff：着火了！、狱火、霜火、霜噬、诅咒焰、暗影焰、日耀、中毒、毒液、带电、流血
+        //总体要加强的debuff：着火了！、狱火、霜火、霜噬、诅咒焰、暗影焰、日耀、中毒、毒液、带电、流血
         public static int[] damagingDebuffsToBuff =
         {
             BuffID.OnFire, BuffID.OnFire3, BuffID.Frostburn, BuffID.Frostburn2, BuffID.CursedInferno,

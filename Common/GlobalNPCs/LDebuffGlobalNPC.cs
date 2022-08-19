@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Terraria.ID;
 
 namespace LBuffMod.Common.GlobalNPCs
 {
@@ -22,10 +23,11 @@ namespace LBuffMod.Common.GlobalNPCs
                         int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.9f, 4f, npc.buffTime[buffIndex] / 43200f));
                         npc.lifeRegen += additionalDamage;
                         damage -= additionalDamage / 2;
-                        Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
+                        Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage + " lifeRegen: " + npc.lifeRegen);
                     }
                 }
             }
+            //流血真的流血了
             if (npc.HasBuff(BuffID.Bleeding))
             {
                 npc.lifeRegen -= 6;
@@ -33,6 +35,12 @@ namespace LBuffMod.Common.GlobalNPCs
                 {
                     npc.lifeRegen = 0;
                 }
+            }
+            //带电真的根据速度掉血了
+            if (npc.HasBuff(BuffID.Electrified))
+            {
+                float f = Vector2.Distance(npc.velocity, Vector2.Zero) / 64;
+                npc.lifeRegen -= 8 + (f > 36 ? 36 : (int)f);
             }
         }
         public override void ModifyHitByItem(NPC npc, Player player, Item item, ref int damage, ref float knockback, ref bool crit)
@@ -102,17 +110,34 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void OnHitPlayer(NPC npc, Player target, int damage, bool crit)
         {
+            #region Electrify on hit
+            //接触时触电，两者平分持续时间
+            int npcElectrifiedIndex = npc.FindBuffIndex(BuffID.Electrified);
+            int targetElectrifiedIndex = target.FindBuffIndex(BuffID.Electrified);
+            if (npcElectrifiedIndex != -1 || targetElectrifiedIndex != -1)
+            {
+                int npcElectrifiedTime = npc.buffTime[npcElectrifiedIndex];
+                int targetElectrifiedTime = target.buffTime[targetElectrifiedIndex];
+                target.buffTime[targetElectrifiedIndex] = npc.buffTime[npcElectrifiedIndex] = (int)((targetElectrifiedTime + npcElectrifiedTime) * 0.5f);
+            }
+            #endregion
+            #region Pre-hard mode NPCs inflicting damaging debuffs
             //世吞、大中小噬魂怪、腐化者近战
             if (npc.type == NPCID.EaterofWorldsBody || npc.type == NPCID.EaterofWorldsHead || npc.type == NPCID.EaterofWorldsTail || npc.type == NPCID.EaterofSouls || npc.type == NPCID.BigEater || npc.type == NPCID.LittleEater || npc.type == NPCID.Corruptor)
             {
                 if (!Main.hardMode)
                 {
-                    target.AddBuff(BuffID.OnFire, 48);//96 in expert world, 120 in master world
+                    target.AddBuff(BuffID.OnFire, 24);//48 in expert world, 60 in master world
                 }
                 if (Main.hardMode)
                 {
-                    target.AddBuff(BuffID.CursedInferno, 96);
+                    target.AddBuff(BuffID.CursedInferno, 48);
                 }
+            }
+            //克脑、血腥僵尸、滴滴怪、僵尸人鱼、哥布林鲨、血鳗鱼头、血鱿鱼、恐惧鹦鹉螺
+            if (npc.type == NPCID.BrainofCthulhu || npc.type == NPCID.BloodZombie || npc.type == NPCID.Drippler || npc.type == NPCID.ZombieMerman || npc.type == NPCID.GoblinShark || npc.type == NPCID.BloodEelHead || npc.type == NPCID.BloodSquid || npc.type == NPCID.BloodNautilus)
+            {
+                target.AddBuff(BuffID.Bleeding, 120);
             }
             //血肉墙、饿鬼、血蛭的近战
             if (npc.type == NPCID.TheHungry || npc.type == NPCID.TheHungryII || npc.type == NPCID.WallofFlesh || npc.type == NPCID.WallofFleshEye || npc.type == NPCID.LeechHead || npc.type == NPCID.LeechBody || npc.type == NPCID.LeechTail)
@@ -126,16 +151,20 @@ namespace LBuffMod.Common.GlobalNPCs
                     target.AddBuff(BuffID.CursedInferno, 120);
                 }
             }
-            //机械骷髅王、激光眼近战
-            if (npc.type == NPCID.SkeletronPrime || npc.type == NPCID.PrimeCannon || npc.type == NPCID.PrimeLaser || npc.type == NPCID.PrimeSaw || npc.type == NPCID.PrimeVice || npc.type == NPCID.Retinazer)
+            #endregion
+            #region Hard mode NPCs inflicting damaging debuffs
+            //机械骷髅王、激光眼、毁灭者身体&尾近战
+            if (npc.type == NPCID.SkeletronPrime || npc.type == NPCID.PrimeCannon || npc.type == NPCID.PrimeLaser || npc.type == NPCID.PrimeSaw || npc.type == NPCID.PrimeVice || npc.type == NPCID.Retinazer || npc.type == NPCID.TheDestroyerBody || npc.type == NPCID.TheDestroyerTail)
             {
                 target.AddBuff(BuffID.CursedInferno, 120);
             }
-            //魔焰眼近战
-            if (npc.type == NPCID.Spazmatism)
+            //魔焰眼、毁灭者头近战
+            if (npc.type == NPCID.Spazmatism || npc.type == NPCID.TheDestroyer)
             {
                 target.AddBuff(BuffID.CursedInferno, 240);
             }
+            #endregion
+            //TODO More NPCs to inflict debuffs!!!
         }
     }
 }
