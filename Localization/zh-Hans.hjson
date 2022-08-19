@@ -6,5 +6,9 @@
 		{
 			AcidicSword : "酸性的剑"
 		}
+		TooltipLines:
+		{
+			RoyalGelFireTooltip : "降低20%伤害\n你的攻击施加 着火了！减益\n附近的敌人受到的来自常规火焰的伤害增加"
+		}
 	}
 }

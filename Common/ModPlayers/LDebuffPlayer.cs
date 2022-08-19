@@ -9,20 +9,34 @@ namespace LBuffMod.Common.ModPlayers
 {
     public class LDebuffPlayer : ModPlayer
     {
+        public bool royalGelOnFire = false;
+        public static int royalGelFireDamage = -5;
+        public bool sharkToothNecklaceBleeding = false;
+        public bool sweetheartNecklaceBleedingAndPoison = false;
+        public override void ResetEffects()
+        {
+            royalGelOnFire = false;
+            sharkToothNecklaceBleeding = false;
+            sweetheartNecklaceBleedingAndPoison = false;
+        }
+        public override void UpdateEquips()
+        {
+            if (royalGelOnFire)
+            {
+                Player.GetDamage(DamageClass.Generic) -= 0.2f;
+            }
+        }
         public override void UpdateBadLifeRegen()
         {
-            if (Player.lifeRegen < 0)
+            //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
+            for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
             {
-                //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
-                for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+                int buffIndex = Player.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
+                if (buffIndex != -1)//TODO Balanced formula needed
                 {
-                    int buffIndex = Player.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
-                    if (buffIndex != -1)//TODO Balanced formula needed
-                    {
-                        int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.1f, 3f, Player.buffTime[buffIndex] / 6300f));
-                        Player.lifeRegen += additionalDamage;
-                        //Main.NewText("Player: buffTime: " + Player.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
-                    }
+                    int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.1f, 3f, Player.buffTime[buffIndex] / 6300f));
+                    Player.lifeRegen += additionalDamage;
+                    //Main.NewText("Player: buffTime: " + Player.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
                 }
             }
             //流血真的流血了
@@ -72,6 +86,12 @@ namespace LBuffMod.Common.ModPlayers
                     }
                 }
             }
+            //流血增伤
+            if (Player.HasBuff(BuffID.Bleeding))
+            {
+                int buffTime = Player.FindBuffIndex(BuffID.Bleeding);
+                damage += (int)(damage * MathHelper.Lerp(0.1f, 0.5f, buffTime / 6300));
+            }
         }
         public override void ModifyHitByProjectile(Projectile proj, ref int damage, ref bool crit)
         {
@@ -96,7 +116,61 @@ namespace LBuffMod.Common.ModPlayers
                         crit = Main.rand.Next(1, 100) < c ? true : false;
                     }
                 }
+            }
+            //流血增伤
+            if (Player.HasBuff(BuffID.Bleeding))
+            {
+                int buffTime = Player.FindBuffIndex(BuffID.Bleeding);
+                damage += (int)(damage * MathHelper.Lerp(0.1f, 0.5f, buffTime / 6300));
+            }
+        }
+        public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit)
+        {
+            //皇家凝胶施加着火
+            if (royalGelOnFire)
+            {
+                target.AddBuff(BuffID.OnFire, 120);
+            }
+            //鲨牙项链施加流血
+            if (sharkToothNecklaceBleeding)
+            {
+                target.AddBuff(BuffID.Bleeding, 120);
+            }
+            //甜心项链施加流血和中毒
+            if (sweetheartNecklaceBleedingAndPoison)
+            {
+                target.AddBuff(BuffID.Bleeding, 120);
+                target.AddBuff(BuffID.Poisoned, 60);
+            }
 
+        }
+        public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+        {
+            //血箭、血蛙、血蝠、血雨
+            if (proj.type == ProjectileID.BloodArrow || proj.type == ProjectileID.VampireFrog || proj.type == ProjectileID.BatOfLight || proj.type == ProjectileID.BloodRain)
+            {
+                target.AddBuff(BuffID.Bleeding, 180);
+            }
+            //血荆棘、滴滴链球
+            if (proj.type == ProjectileID.SharpTears || proj.type == ProjectileID.DripplerFlail)
+            {
+                target.AddBuff(BuffID.Bleeding, 720);
+            }
+            //皇家凝胶施加着火
+            if (royalGelOnFire)
+            {
+                target.AddBuff(BuffID.OnFire, 60);
+            }
+            //鲨牙项链施加流血
+            if (sharkToothNecklaceBleeding)
+            {
+                target.AddBuff(BuffID.Bleeding, 60);
+            }
+            //甜心项链施加流血和中毒
+            if (sweetheartNecklaceBleedingAndPoison)
+            {
+                target.AddBuff(BuffID.Bleeding, 60);
+                target.AddBuff(BuffID.Poisoned, 60);
             }
         }
     }

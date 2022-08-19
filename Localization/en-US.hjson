@@ -6,5 +6,11 @@
 		{
 			AcidicSword : "Acidic Sword"
 		}
+		TooltipLines:
+		{
+			RoyalGelFireTooltip : "Reduces damage by 20%\nYour attacks inflict OnFire!\nEnemies around you recieve more damage from normal fire debuffs"
+			SharkToothNecklaceBleedingTooltip : "Your attacks inflict Bleeding"
+			SweetheartNecklaceBleedingAndPoisonTooltip : "Your attacks inflict Bleeding and Poisoned"
+		}
 	}
 }

@@ -36,6 +36,16 @@ namespace LBuffMod.Common.Utilities
             BuffID.OnFire, BuffID.OnFire3, BuffID.Frostburn, BuffID.Frostburn2, BuffID.CursedInferno,
             BuffID.ShadowFlame, BuffID.Daybreak, BuffID.Burning
         };
+        //常规火焰
+        public static int[] normalFireDebuffs =
+        {
+            BuffID.OnFire, BuffID.OnFire3, BuffID.Burning, BuffID.Daybreak
+        };
+        //霜冻火焰
+        public static int[] frostFireDebuffs =
+        {
+            BuffID.Frostburn, BuffID.Frostburn2
+        };
         //毒性debuff：中毒、毒液
         public static int[] poisonousDebuffs =
         {

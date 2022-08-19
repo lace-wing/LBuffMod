@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Terraria.ID;
+using LBuffMod.Common.ModPlayers;
 
 namespace LBuffMod.Common.GlobalNPCs
 {
@@ -12,19 +12,16 @@ namespace LBuffMod.Common.GlobalNPCs
     {
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
-            if (npc.lifeRegen < 0)
+            //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
+            for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
             {
-                //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
-                for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+                int buffIndex = npc.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
+                if (buffIndex != -1)//TODO Balanced formula needed
                 {
-                    int buffIndex = npc.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
-                    if (buffIndex != -1)//TODO Balanced formula needed
-                    {
-                        int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.9f, 4f, npc.buffTime[buffIndex] / 43200f));
-                        npc.lifeRegen += additionalDamage;
-                        damage -= additionalDamage / 2;
-                        Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage + " lifeRegen: " + npc.lifeRegen);
-                    }
+                    int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.9f, 4f, npc.buffTime[buffIndex] / 43200f));
+                    npc.lifeRegen += additionalDamage;
+                    damage -= additionalDamage / 2;
+                    Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage + " lifeRegen: " + npc.lifeRegen);
                 }
             }
             //流血真的流血了
@@ -41,6 +38,18 @@ namespace LBuffMod.Common.GlobalNPCs
             {
                 float f = Vector2.Distance(npc.velocity, Vector2.Zero) / 64;
                 npc.lifeRegen -= 8 + (f > 36 ? 36 : (int)f);
+            }
+            //皇家凝胶常规火焰增伤
+            for (int i = 0; i < Main.player.Length; i++)
+            {
+                if (Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelOnFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
+                {
+                    for (int j = 0; j < LBuffUtils.normalFireDebuffs.Length; j++)
+                    {
+                        npc.lifeRegen += LDebuffPlayer.royalGelFireDamage;
+                        damage -= (int)(LDebuffPlayer.royalGelFireDamage / 2f);
+                    }
+                }
             }
         }
         public override void ModifyHitByItem(NPC npc, Player player, Item item, ref int damage, ref float knockback, ref bool crit)
@@ -71,6 +80,12 @@ namespace LBuffMod.Common.GlobalNPCs
                     }
                 }
             }
+            //流血增伤
+            if (npc.HasBuff(BuffID.Bleeding))
+            {
+                int buffTime = npc.FindBuffIndex(BuffID.Bleeding);
+                damage += (int)(damage * MathHelper.Lerp(0.05f, 0.5f, buffTime / 43200));
+            }
         }
         public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
@@ -99,6 +114,12 @@ namespace LBuffMod.Common.GlobalNPCs
                         npc.buffTime[buffIndex] /= 4;
                     }
                 }
+            }
+            //流血增伤
+            if (npc.HasBuff(BuffID.Bleeding))
+            {
+                int buffTime = npc.FindBuffIndex(BuffID.Bleeding);
+                damage += (int)(damage * MathHelper.Lerp(0.05f, 0.5f, buffTime / 43200));
             }
         }
         public override void PostAI(NPC npc)
