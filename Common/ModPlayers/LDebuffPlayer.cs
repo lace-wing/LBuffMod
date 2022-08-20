@@ -29,7 +29,7 @@ namespace LBuffMod.Common.ModPlayers
         public override void UpdateBadLifeRegen()
         {
             //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
-            for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+            /*for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
             {
                 int buffIndex = Player.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
                 if (buffIndex != -1)//TODO Balanced formula needed
@@ -38,7 +38,7 @@ namespace LBuffMod.Common.ModPlayers
                     Player.lifeRegen += additionalDamage;
                     //Main.NewText("Player: buffTime: " + Player.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
                 }
-            }
+            }*/
             //流血真的流血了
             if (Player.HasBuff(BuffID.Bleeding))
             {
@@ -51,14 +51,14 @@ namespace LBuffMod.Common.ModPlayers
             //带电真的根据移动速度掉血了
             if (Player.HasBuff(BuffID.Electrified))
             {
-                if (Player.velocity.X == 0 && (Player.controlLeft || Player.controlRight))
+                if (Player.controlLeft || Player.controlRight)
                 {
                     Player.lifeRegen += 32;
                 }
                 if (Player.velocity != Vector2.Zero && (Player.controlLeft || Player.controlRight || Player.controlJump))
                 {
-                    float f = Vector2.Distance(Player.velocity, Vector2.Zero) / 144;
-                    Player.lifeRegen -= f > 4 ? 4 : (int)f;
+                    int f = Math.Clamp((int)(Vector2.Distance(Player.position, Player.oldPosition) * 2), 8, 48);
+                    Player.lifeRegen -= f;
                 }
             }
         }
@@ -146,7 +146,7 @@ namespace LBuffMod.Common.ModPlayers
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            Main.NewText("NPC lifeRegen: " + target.lifeRegen);
+            //Main.NewText("NPC lifeRegen: " + target.lifeRegen);
             //血箭、血蛙、血蝠、血雨
             if (proj.type == ProjectileID.BloodArrow || proj.type == ProjectileID.VampireFrog || proj.type == ProjectileID.BatOfLight || proj.type == ProjectileID.BloodRain)
             {
@@ -161,6 +161,7 @@ namespace LBuffMod.Common.ModPlayers
             if (royalGelOnFire)
             {
                 target.AddBuff(BuffID.OnFire, 60);
+                //target.AddBuff(BuffID.Electrified, 180);
             }
             //鲨牙项链施加流血
             if (sharkToothNecklaceBleeding)

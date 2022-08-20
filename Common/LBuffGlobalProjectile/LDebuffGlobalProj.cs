@@ -23,8 +23,6 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
         }
         public override void OnHitPlayer(Projectile projectile, Player target, int damage, bool crit)
         {
-            //NPC npc = Main.npc[projectile.owner];
-            Main.NewText(npc);
             #region Pre-hard Mode projs inflicting damaging debuffs
             //哥布林鲨、血鱿鱼、恐惧鹦鹉螺
             if (npc.type == NPCID.GoblinShark || npc.type == NPCID.BloodSquid || npc.type == NPCID.BloodNautilus)

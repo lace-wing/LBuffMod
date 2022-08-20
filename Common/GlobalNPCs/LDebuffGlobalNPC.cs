@@ -36,8 +36,8 @@ namespace LBuffMod.Common.GlobalNPCs
             //带电真的根据速度掉血了
             if (npc.HasBuff(BuffID.Electrified))
             {
-                float f = Vector2.Distance(npc.velocity, Vector2.Zero) * 24;
-                npc.lifeRegen -= 8 + (f > 512 ? 512 : (int)f);
+                int f = Math.Clamp((int)(Vector2.Distance(npc.position, npc.oldPosition) * 128f), 8, 1024);
+                npc.lifeRegen -= f;
             }
             //皇家凝胶常规火焰增伤
             for (int i = 0; i < Main.player.Length; i++)

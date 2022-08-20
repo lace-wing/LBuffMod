@@ -35,13 +35,11 @@ namespace LBuffMod.Content.Items.Weapons
         {
             return true;
         }
-        public override bool CanUseItem(Player player)
+        public override bool? UseItem(Player player)
         {
-            if (AltFunctionUse(player))
-            {
-                player.AddBuff(BuffID.Electrified, 600);
-            }
-            return base.CanUseItem(player);
+            player.AddBuff(BuffID.Electrified, 600);
+            Main.NewText(player.lifeRegen);
+            return base.UseItem(player);
         }
     }
 }
