@@ -1,6 +1,7 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using LBuffMod.Content.Buffs;
 
 namespace LBuffMod.Content.Items.Weapons
 {
@@ -38,6 +39,7 @@ namespace LBuffMod.Content.Items.Weapons
         public override bool? UseItem(Player player)
         {
             player.AddBuff(BuffID.Electrified, 600);
+            player.AddBuff(ModContent.BuffType<Madness>(), 60000);
             Main.NewText(player.lifeRegen);
             return base.UseItem(player);
         }

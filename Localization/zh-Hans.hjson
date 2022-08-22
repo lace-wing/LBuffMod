@@ -12,5 +12,13 @@
 			SharkToothNecklaceBleedingTooltip : "你的攻击施加 流血"
 			StingerNecklaceBleedingAndPoisonTooltip : "你的攻击施加 流血 和 中毒"
 		}
+		BuffName:
+		{
+			Madness : "发电"
+		}
+		BuffDescription: 
+		{
+			Madness : "来自零群理发店的神秘力量"
+		}
 	}
 }

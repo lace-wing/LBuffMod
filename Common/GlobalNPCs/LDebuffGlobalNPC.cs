@@ -18,7 +18,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 int buffIndex = npc.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
                 if (buffIndex != -1)//TODO Balanced formula needed
                 {
-                    int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.9f, 4f, npc.buffTime[buffIndex] / 43200f));
+                    int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.3f, 3f, npc.buffTime[buffIndex] / 43200f));
                     npc.lifeRegen += additionalDamage;
                     damage -= additionalDamage / 2;
                     //Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage + " lifeRegen: " + npc.lifeRegen);
@@ -27,17 +27,33 @@ namespace LBuffMod.Common.GlobalNPCs
             //流血真的流血了
             if (npc.HasBuff(BuffID.Bleeding))
             {
-                npc.lifeRegen -= 6;
+                npc.lifeRegen += LBuffUtils.BuffIDToLifeRegen(BuffID.Bleeding);
                 if (npc.lifeRegen > 0)
                 {
                     npc.lifeRegen = 0;
                 }
+                if (npc.lifeRegen < 0)
+                {
+                    damage -= LBuffUtils.BuffIDToLifeRegen(BuffID.Bleeding);
+                }
+            }
+            //灼烧也掉血了
+            if (npc.HasBuff(BuffID.Burning))
+            {
+                if (npc.lifeRegen > 0)
+                {
+                    npc.lifeRegen = 0;
+                }
+                npc.lifeRegen += LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
+                damage -= LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
+                Dust.NewDustDirect(npc.BottomLeft, npc.width, 4, DustID.FlameBurst);
             }
             //带电真的根据速度掉血了
             if (npc.HasBuff(BuffID.Electrified))
             {
                 int f = Math.Clamp((int)(Vector2.Distance(npc.position, npc.oldPosition) * 128f), 8, 1024);
                 npc.lifeRegen -= f;
+                damage += f;
             }
             //皇家凝胶常规火焰增伤
             for (int i = 0; i < Main.player.Length; i++)
@@ -127,9 +143,23 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void PostAI(NPC npc)
         {
+            //Main.NewText(Main.GameUpdateCount % 60);
             if (npc.type == NPCID.BrainofCthulhu)
             {
                 npc.AddBuff(BuffID.Bleeding, 60);
+                Main.NewText("GameUpdate: " + Main.GameUpdateCount % 60 + " buffTime: " + npc.buffTime[npc.FindBuffIndex(BuffID.Bleeding)] + " lifeRegen: " + npc.lifeRegen);
+            }
+            //站在陨石、狱石、狱石砖上时施加灼烧
+            for (int i = 0; i < (int)(npc.width / 16f); i++)
+            {
+                int bX = (int)npc.BottomLeft.X / 16 + i;
+                int bY = (int)npc.BottomLeft.Y / 16;
+                Tile tileSteppingOn = Main.tile[bX, bY];
+                if (tileSteppingOn.HasUnactuatedTile && Main.tileSolid[tileSteppingOn.TileType] && (tileSteppingOn.TileType == TileID.Meteorite || tileSteppingOn.TileType == TileID.Hellstone || tileSteppingOn.TileType == TileID.HellstoneBrick))
+                {
+                    npc.AddBuff(BuffID.Burning, 60);//为什么每次update只+5？？？
+                    Main.NewText("GameUpdate: " + Main.GameUpdateCount % 60 + " buffTime: " + npc.buffTime[npc.FindBuffIndex(BuffID.Burning)] + " lifeRegen: " + npc.lifeRegen);
+                }
             }
         }
         public override void OnHitPlayer(NPC npc, Player target, int damage, bool crit)
