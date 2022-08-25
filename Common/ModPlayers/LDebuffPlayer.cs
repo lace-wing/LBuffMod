@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LBuffMod.Content.Buffs;
+using Terraria.DataStructures;
 
 namespace LBuffMod.Common.ModPlayers
 {
@@ -129,7 +130,7 @@ namespace LBuffMod.Common.ModPlayers
             {
                 if (damage >= 4)
                 {
-                    Player.AddBuff(BuffID.Electrified, 300);
+                    Player.AddBuff(BuffID.Electrified, 900);
                     Player.AddBuff(ModContent.BuffType<Madness>(), 360);
                 }
             }
@@ -169,13 +170,32 @@ namespace LBuffMod.Common.ModPlayers
             {
                 if (damage >= 4)
                 {
-                    Player.AddBuff(BuffID.Electrified, 300);
+                    Player.AddBuff(BuffID.Electrified, 900);
                     Player.AddBuff(ModContent.BuffType<Madness>(), 360);
                 }
             }
         }
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit)
         {
+            //毁灭刃
+            if (item.type == ItemID.BreakerBlade && target.life >= target.lifeMax * 0.8f)
+            {
+                target.AddBuff(BuffID.OnFire3, 1800);
+                target.AddBuff(BuffID.Bleeding, 1800);
+                damage = (int)(damage * 1.5f);
+                if (crit)
+                {
+                    target.AddBuff(BuffID.Burning, 900);
+                    target.AddBuff(BuffID.Bleeding, 1800);
+                }
+                if (Main.myPlayer == Player.whoAmI)
+                {
+                    Vector2 position = new Vector2(Player.Center.X + Main.screenHeight * 0.5f + Main.rand.Next(-Main.screenWidth / 2, Main.screenWidth / 2) - Main.screenPosition.X, Player.Center.Y + Main.screenWidth * 0.5f + Main.rand.Next(-Main.screenHeight / 2, Main.screenHeight / 2) - Main.screenPosition.Y);
+                    Projectile BreakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(position - Player.Center), ProjectileID.Fireball, (int)(item.damage * 0.5f), item.knockBack * 0.5f, Player.whoAmI);
+                    BreakerBladeFireBall.friendly = true;
+                    BreakerBladeFireBall.hostile = false;
+                }
+            }
             //皇家凝胶施加着火
             if (royalGelOnFire)
             {
