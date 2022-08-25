@@ -25,6 +25,17 @@ namespace LBuffMod.Common.GlobalItems
                 player.GetModPlayer<LDebuffPlayer>().stingerNecklaceBleedingAndPoison = true;
             }
         }
+        public override void UpdateInventory(Item item, Player player)
+        {
+            //毁灭刃
+            if (item.type == ItemID.BreakerBlade)
+            {
+                if (item.scale < 1f)
+                {
+                    item.scale -= 0.02f;
+                }
+            }
+        }
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
             if (item.type == ItemID.RoyalGel)

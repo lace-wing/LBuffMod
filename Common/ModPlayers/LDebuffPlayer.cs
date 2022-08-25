@@ -186,8 +186,7 @@ namespace LBuffMod.Common.ModPlayers
                 }
                 if (item.scale > 3f || crit)
                 {
-                    damage = (int)(damage * item.scale);
-                    item.scale = 1;
+                    damage = (int)(damage * item.scale * 0.5f);
                 }
                 if (target.life <= target.lifeMax * 0.9f)
                 {
@@ -204,7 +203,7 @@ namespace LBuffMod.Common.ModPlayers
                 {
                     bool opp = Main.rand.NextBool();
                     Vector2 position = target.Center + new Vector2((opp ? 980 : -980) + (opp ? Main.rand.Next(-1960, 0) : Main.rand.Next(0, 1960)), (opp ? 620 : -620) + (opp ? Main.rand.Next(-640, 0) : Main.rand.Next(0, 640)));
-                    Projectile BreakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(Player.Center - position) * 4, ProjectileID.CultistBossFireBall, (int)(item.damage * 0.8f), item.knockBack * 0.5f, Player.whoAmI);
+                    Projectile BreakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(Player.Center - position) * 4, ProjectileID.CultistBossFireBall, (int)(damage * 0.8f), item.knockBack * 0.5f, Player.whoAmI);
                     BreakerBladeFireBall.friendly = true;
                     BreakerBladeFireBall.hostile = false;
                     BreakerBladeFireBall.tileCollide = false;
