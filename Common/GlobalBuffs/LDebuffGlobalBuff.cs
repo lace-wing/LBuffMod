@@ -52,5 +52,21 @@ namespace LBuffMod.Common.GlobalBuffs
             }
             return base.ReApply(type, player, time, buffIndex);
         }
+        public override void Update(int type, NPC npc, ref int buffIndex)
+        {
+            //带电、灼烧更快流失
+            if (type == BuffID.Electrified || type == BuffID.Burning)
+            {
+                npc.buffTime[buffIndex] -= 1;
+            }
+        }
+        public override void Update(int type, Player player, ref int buffIndex)
+        {
+            //带电、灼烧更快流失
+            if (type == BuffID.Electrified || type == BuffID.Burning)
+            {
+                player.buffTime[buffIndex] -= 1;
+            }
+        }
     }
 }

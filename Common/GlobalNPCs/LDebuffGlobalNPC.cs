@@ -51,7 +51,7 @@ namespace LBuffMod.Common.GlobalNPCs
             //带电真的根据速度掉血了
             if (npc.HasBuff(BuffID.Electrified))
             {
-                int f = Math.Clamp((int)(Vector2.Distance(npc.position, npc.oldPosition) * 128f), 8, 1024);
+                int f = Math.Clamp((int)(Vector2.Distance(npc.position, npc.oldPosition) * 25f), 8, 1024);
                 npc.lifeRegen -= f;
                 damage += f;
             }

@@ -34,9 +34,15 @@ namespace LBuffMod.Common.ModPlayers
             {
                 Player.statLifeMax2 += 30;
                 Player.statManaMax2 += 30;
-                if (Player.HasBuff(BuffID.Electrified))
+                Player.statDefense -= 3;
+                if (Player.HasBuff(BuffID.Electrified))//同时发电和带电
                 {
-
+                    Player.moveSpeed += 0.1f;
+                    Player.noKnockback = true;
+                    Player.GetDamage(DamageClass.Magic) += 0.1f;
+                    Player.GetDamage(DamageClass.Summon) += 0.1f;
+                    Player.GetDamage(DamageClass.Melee) -= 0.1f;
+                    Player.GetDamage(DamageClass.Ranged) -= 0.1f;
                 }
             }
         }
@@ -79,12 +85,12 @@ namespace LBuffMod.Common.ModPlayers
                 }
                 if (Player.velocity != Vector2.Zero && (Player.controlLeft || Player.controlRight || Player.controlJump) && !madnessDebuff)
                 {
-                    int f = Math.Clamp((int)(Vector2.Distance(Player.position, Player.oldPosition) * 2), 0, 48);
+                    int f = Math.Clamp((int)(Vector2.Distance(Player.position, Player.oldPosition) / 4f), 0, 96);
                     Player.lifeRegen -= f;
                 }
                 if (madnessDebuff)
                 {
-                    Player.lifeRegen += 4;
+                    Player.lifeRegen += 38;
                 }
             }
         }

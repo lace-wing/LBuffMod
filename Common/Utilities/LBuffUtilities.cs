@@ -46,6 +46,11 @@ namespace LBuffMod.Common.Utilities
         {
             BuffID.Frostburn, BuffID.Frostburn2
         };
+        //邪恶火焰
+        public static int[] evilFires =
+        {
+            BuffID.CursedInferno, BuffID.ShadowFlame
+        };
         //毒性debuff：中毒、毒液
         public static int[] poisonousDebuffs =
         {
@@ -102,7 +107,7 @@ namespace LBuffMod.Common.Utilities
                 case BuffID.BoneJavelin:
                     return -6;
                 case BuffID.Electrified:
-                    return -8;
+                    return -40;
                 case BuffID.DryadsWardDebuff:
                     return -14;
                 case BuffID.Suffocation:
