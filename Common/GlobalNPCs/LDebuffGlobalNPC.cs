@@ -46,7 +46,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 }
                 npc.lifeRegen += LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
                 damage -= LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
-                Dust.NewDustDirect(npc.BottomLeft, npc.width, 4, DustID.FlameBurst);
+                //Dust.NewDustDirect(npc.BottomLeft, npc.width, 4, DustID.FlameBurst);
             }
             //带电真的根据速度掉血了
             if (npc.HasBuff(BuffID.Electrified))

@@ -178,22 +178,37 @@ namespace LBuffMod.Common.ModPlayers
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit)
         {
             //毁灭刃
-            if (item.type == ItemID.BreakerBlade && target.life >= target.lifeMax * 0.8f)
+            if (item.type == ItemID.BreakerBlade)
             {
-                target.AddBuff(BuffID.OnFire3, 1800);
-                target.AddBuff(BuffID.Bleeding, 1800);
-                damage = (int)(damage * 1.5f);
-                if (crit)
+                if (item.scale < 4f)
                 {
-                    target.AddBuff(BuffID.Burning, 900);
-                    target.AddBuff(BuffID.Bleeding, 1800);
+                    item.scale += 0.2f;
                 }
-                if (Main.myPlayer == Player.whoAmI)
+                if (item.scale > 3f || crit)
                 {
-                    Vector2 position = new Vector2(Player.Center.X + Main.screenHeight * 0.5f + Main.rand.Next(-Main.screenWidth / 2, Main.screenWidth / 2) - Main.screenPosition.X, Player.Center.Y + Main.screenWidth * 0.5f + Main.rand.Next(-Main.screenHeight / 2, Main.screenHeight / 2) - Main.screenPosition.Y);
-                    Projectile BreakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(position - Player.Center), ProjectileID.Fireball, (int)(item.damage * 0.5f), item.knockBack * 0.5f, Player.whoAmI);
+                    damage = (int)(damage * item.scale);
+                    item.scale = 1;
+                }
+                if (target.life <= target.lifeMax * 0.9f)
+                {
+                    target.AddBuff(BuffID.OnFire3, 1800);
+                    target.AddBuff(BuffID.Bleeding, 1800);
+                    damage = (int)(damage * 1.5f);
+                    if (crit)
+                    {
+                        target.AddBuff(BuffID.Burning, 1800);
+                        target.AddBuff(BuffID.Bleeding, 1800);
+                    }
+                }
+                if (Main.myPlayer == Player.whoAmI && Main.GameUpdateCount % 20 == 0)
+                {
+                    bool opp = Main.rand.NextBool();
+                    Vector2 position = target.Center + new Vector2((opp ? 980 : -980) + (opp ? Main.rand.Next(-1960, 0) : Main.rand.Next(0, 1960)), (opp ? 620 : -620) + (opp ? Main.rand.Next(-640, 0) : Main.rand.Next(0, 640)));
+                    Projectile BreakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(Player.Center - position) * 4, ProjectileID.CultistBossFireBall, (int)(item.damage * 0.8f), item.knockBack * 0.5f, Player.whoAmI);
                     BreakerBladeFireBall.friendly = true;
                     BreakerBladeFireBall.hostile = false;
+                    BreakerBladeFireBall.tileCollide = false;
+                    BreakerBladeFireBall.extraUpdates += 1;
                 }
             }
             //皇家凝胶施加着火
@@ -220,7 +235,6 @@ namespace LBuffMod.Common.ModPlayers
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            //Main.NewText("NPC lifeRegen: " + target.lifeRegen);
             //血箭、血蛙、血蝠、血雨
             if (proj.type == ProjectileID.BloodArrow || proj.type == ProjectileID.VampireFrog || proj.type == ProjectileID.BatOfLight || proj.type == ProjectileID.BloodRain)
             {
@@ -230,6 +244,15 @@ namespace LBuffMod.Common.ModPlayers
             if (proj.type == ProjectileID.SharpTears || proj.type == ProjectileID.DripplerFlail)
             {
                 target.AddBuff(BuffID.Bleeding, 720);
+            }
+            //拜月邪教徒火球
+            if (proj.type == ProjectileID.CultistBossFireBall)
+            {
+                target.AddBuff(BuffID.Burning, 60);
+                if (target.life <= target.lifeMax * 0.8f)
+                {
+                    damage = (int)(damage * 1.5f);
+                }
             }
             //皇家凝胶施加着火
             if (royalGelOnFire)
