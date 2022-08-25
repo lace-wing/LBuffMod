@@ -14,6 +14,7 @@
 			StingerNecklaceBleedingAndPoisonTooltip : "Your attacks inflict Bleeding and Poisoned"
 			#武器
 			BreakerBladeBuffsTooltip : "你被加强了，快上！"
+			BloodWeaponsTooltip : "施加流血"
 		}
 		BuffName:
 		{

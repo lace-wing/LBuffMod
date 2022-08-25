@@ -30,7 +30,11 @@ namespace LBuffMod.Common.GlobalItems
             //毁灭刃
             if (item.type == ItemID.BreakerBlade)
             {
-                if (item.scale > 1f)
+                if (item.scale < 1.6f)
+                {
+                    item.scale = 1.6f;
+                } 
+                if (item.scale > 1.6f)
                 {
                     item.scale -= 0.002f;
                 }
@@ -55,6 +59,10 @@ namespace LBuffMod.Common.GlobalItems
             if (item.type == ItemID.BreakerBlade)
             {
                 tooltips.Add(new(Mod, "BreakerBladeBuffsTooltip", Language.GetTextValue("Mods.LBuffMod.TooltipLines.BreakerBladeBuffsTooltip")));
+            }
+            if (item.type == ItemID.VampireFrogStaff || item.type == ItemID.BloodRainBow || item.type == ItemID.SanguineStaff || item.type == ItemID.DripplerFlail)
+            {
+                tooltips.Add(new(Mod, "BloodWeaponsTooltip", Language.GetTextValue("Mods.LBuffMod.TooltipLines.BloodWeaponsTooltip")));
             }
         }
     }

@@ -90,7 +90,7 @@ namespace LBuffMod.Common.GlobalNPCs
                     damage = (int)(damage * 1.05);
                     if (!crit && item.DamageType != DamageClass.Summon)
                     {
-                        int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]);
+                        int c = (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) * 0.8f);
                         crit = Main.rand.Next(1, 100) < c ? true : false;
                     }
                 }
@@ -125,7 +125,7 @@ namespace LBuffMod.Common.GlobalNPCs
                     damage = (int)(damage * 1.05);
                     if (!crit && !projectile.minion && projectile.DamageType != DamageClass.Summon)
                     {
-                        int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) - 6;//Lower add-crit chance
+                        int c = (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) * 0.8f) - 4;//Lower add-crit chance
                         crit = Main.rand.Next(1, 100) < c ? true : false;
                     }
                 }
@@ -156,7 +156,7 @@ namespace LBuffMod.Common.GlobalNPCs
             if (npc.type == NPCID.BrainofCthulhu)
             {
                 npc.AddBuff(BuffID.Bleeding, 60);
-                Main.NewText("GameUpdate: " + Main.GameUpdateCount % 60 + " buffTime: " + npc.buffTime[npc.FindBuffIndex(BuffID.Bleeding)] + " lifeRegen: " + npc.lifeRegen);
+                //Main.NewText("GameUpdate: " + Main.GameUpdateCount % 60 + " buffTime: " + npc.buffTime[npc.FindBuffIndex(BuffID.Bleeding)] + " lifeRegen: " + npc.lifeRegen);
             }
             //站在陨石、狱石、狱石砖上时施加灼烧
             for (int i = 0; i < (int)(npc.width / 16f); i++)
@@ -166,8 +166,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 Tile tileSteppingOn = Main.tile[bX, bY];
                 if (tileSteppingOn.HasUnactuatedTile && Main.tileSolid[tileSteppingOn.TileType] && (tileSteppingOn.TileType == TileID.Meteorite || tileSteppingOn.TileType == TileID.Hellstone || tileSteppingOn.TileType == TileID.HellstoneBrick))
                 {
-                    npc.AddBuff(BuffID.Burning, 60);//为什么每次update只+5？？？
-                    Main.NewText("GameUpdate: " + Main.GameUpdateCount % 60 + " buffTime: " + npc.buffTime[npc.FindBuffIndex(BuffID.Burning)] + " lifeRegen: " + npc.lifeRegen);
+                    npc.AddBuff(BuffID.Burning, 60);//为什么每次update只+5？
                 }
             }
         }

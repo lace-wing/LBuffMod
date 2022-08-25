@@ -12,7 +12,7 @@ namespace LBuffMod.Common.ModPlayers
     public class LDebuffPlayer : ModPlayer
     {
         public bool royalGelOnFire = false;
-        public static int royalGelFireDamage = -5;
+        public static int royalGelFireDamage = -6;
         public bool sharkToothNecklaceBleeding = false;
         public bool stingerNecklaceBleedingAndPoison = false;
         public bool madnessDebuff = false;
@@ -180,20 +180,20 @@ namespace LBuffMod.Common.ModPlayers
             //毁灭刃
             if (item.type == ItemID.BreakerBlade)
             {
-                if (item.scale < 3f)
+                if (item.scale < 3.6f)
                 {
                     item.scale += 0.15f;
-                    damage += (int)(item.scale * damage * 0.2f);
+                    damage = (int)(damage / item.scale * 1.8f);
                 }
                 if (target.life >= target.lifeMax * 0.9f)
                 {
-                    target.AddBuff(BuffID.OnFire3, 900);
-                    target.AddBuff(BuffID.Bleeding, 900);
+                    target.AddBuff(BuffID.OnFire3, 600);
+                    target.AddBuff(BuffID.Bleeding, 600);
                     damage = (int)(damage * 3.6f);
                     if (crit)
                     {
-                        target.AddBuff(BuffID.Burning, 900);
-                        target.AddBuff(BuffID.Bleeding, 900);
+                        target.AddBuff(BuffID.Burning, 600);
+                        target.AddBuff(BuffID.Bleeding, 600);
                     }
                 }
                 if (Main.myPlayer == Player.whoAmI)
@@ -202,10 +202,10 @@ namespace LBuffMod.Common.ModPlayers
                     int sW = Main.screenWidth;
                     int sH = Main.screenHeight;
                     Vector2 position = target.Center + new Vector2((opp ? sW * 0.5f : -sW * 0.5f) + (opp ? Main.rand.Next(-sW, 0) : Main.rand.Next(0, sW)), (opp ? sH * 0.5f : -sH * 0.5f) + (opp ? Main.rand.Next(-sH, 0) : Main.rand.Next(0, sH)));
-                    Projectile BreakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(Player.Center - position) * 9, ProjectileID.CultistBossFireBall, (int)(damage * 0.8f), item.knockBack * 0.5f, Player.whoAmI);
-                    BreakerBladeFireBall.friendly = true;
-                    BreakerBladeFireBall.hostile = false;
-                    BreakerBladeFireBall.tileCollide = false;
+                    Projectile breakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(Player.Center - position) * 9, ProjectileID.CultistBossFireBall, (int)(damage * 0.6f), item.knockBack * 0.6f, Player.whoAmI);
+                    breakerBladeFireBall.friendly = true;
+                    breakerBladeFireBall.hostile = false;
+                    breakerBladeFireBall.tileCollide = false;
                 }
             }
             //皇家凝胶施加着火

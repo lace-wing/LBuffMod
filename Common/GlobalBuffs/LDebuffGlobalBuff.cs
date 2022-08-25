@@ -20,7 +20,7 @@ namespace LBuffMod.Common.GlobalBuffs
                     {
                         if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Burning)
                         {
-                            npc.buffTime[buffIndex] += (int)(time * 0.1f);
+                            npc.buffTime[buffIndex] += (int)(time * 0.2f);
                         }
                         else npc.buffTime[buffIndex] += time;
                         return true;
@@ -42,7 +42,7 @@ namespace LBuffMod.Common.GlobalBuffs
                         {
                             if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Burning)
                             {
-                                player.buffTime[buffIndex] += (int)(time * 0.1f);
+                                player.buffTime[buffIndex] += (int)(time * 0.2f);
                             }
                             else player.buffTime[buffIndex] += time;
                             return true;

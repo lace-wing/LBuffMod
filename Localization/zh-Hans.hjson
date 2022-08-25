@@ -9,11 +9,12 @@
 		TooltipLines:
 		{
 			#饰品
-			RoyalGelFireTooltip : "降低20%伤害\n你的攻击施加 着火了！减益\n附近的敌人受到的来自常规火焰的伤害增加"
-			SharkToothNecklaceBleedingTooltip : "你的攻击施加 流血"
-			StingerNecklaceBleedingAndPoisonTooltip : "你的攻击施加 流血 和 中毒"
+			RoyalGelFireTooltip : "降低20%伤害\n你的攻击施加[着火了！]\n附近的敌人受到的来自常规火焰的伤害增加"
+			SharkToothNecklaceBleedingTooltip : "你的攻击施加[流血]"
+			StingerNecklaceBleedingAndPoisonTooltip : "你的攻击施加[流血]和[中毒]"
 			#武器
-			BreakerBladeBuffsTooltip : "你被加强了，快上！"
+			BreakerBladeBuffsTooltip : "LBuffMod：基础大小和造成的伤害提升\n对90%血量及以上的敌人造成更高伤害并附加[灼烧]与[流血]\n命中敌人使毁灭刃变大，伤害降低并召唤火球\n火球对80%血量及以上的敌人造成更高伤害并短暂施加[灼烧]"
+			BloodWeaponsTooltip : "施加流血"
 		}
 		BuffName:
 		{
