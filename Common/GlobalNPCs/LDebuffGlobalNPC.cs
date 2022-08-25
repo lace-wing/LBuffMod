@@ -46,7 +46,11 @@ namespace LBuffMod.Common.GlobalNPCs
                 }
                 npc.lifeRegen += LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
                 damage -= LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
-                //Dust.NewDustDirect(npc.BottomLeft, npc.width, 4, DustID.FlameBurst);
+                /*if (Main.rand.NextBool(2))
+                {
+                    Dust dust = Dust.NewDustDirect(npc.BottomLeft, npc.width, npc.height, DustID.FlameBurst);
+                    dust.scale *= 0.5f;
+                }*/
             }
             //带电真的根据速度掉血了
             if (npc.HasBuff(BuffID.Electrified))
@@ -54,6 +58,11 @@ namespace LBuffMod.Common.GlobalNPCs
                 int f = Math.Clamp((int)(Vector2.Distance(npc.position, npc.oldPosition) * 25f), 8, 1024);
                 npc.lifeRegen -= f;
                 damage += f;
+                /*if (Main.rand.NextBool(2))
+                {
+                    Dust dust = Dust.NewDustDirect(npc.BottomLeft, npc.width, npc.height, DustID.Electric, npc.velocity.X * 0.8f, npc.velocity.Y * 0.8f);
+                    dust.scale *= 0.1f;
+                }*/
             }
             //皇家凝胶常规火焰增伤
             for (int i = 0; i < Main.player.Length; i++)

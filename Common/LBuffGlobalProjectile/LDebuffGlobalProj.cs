@@ -9,7 +9,9 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
 {
     public class LDebuffGlobalProj : GlobalProjectile
     {
-        public static NPC npc;
+        public override bool InstancePerEntity => true;
+        public NPC npc;
+        public Item item;
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
             if (source is EntitySource_Parent)
@@ -18,6 +20,10 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
                 if (source_Parent.Entity is NPC)
                 {
                     npc = (NPC)source_Parent.Entity;
+                }
+                if (source_Parent.Entity is Item)
+                {
+                    item = (Item)source_Parent.Entity;
                 }
             }
         }

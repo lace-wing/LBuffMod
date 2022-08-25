@@ -30,9 +30,9 @@ namespace LBuffMod.Common.GlobalItems
             //毁灭刃
             if (item.type == ItemID.BreakerBlade)
             {
-                if (item.scale < 1f)
+                if (item.scale > 1f)
                 {
-                    item.scale -= 0.02f;
+                    item.scale -= 0.002f;
                 }
             }
         }

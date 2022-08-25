@@ -13,7 +13,7 @@
 			SharkToothNecklaceBleedingTooltip : "你的攻击施加 流血"
 			StingerNecklaceBleedingAndPoisonTooltip : "你的攻击施加 流血 和 中毒"
 			#武器
-			BreakerBladeBuffsTooltip ："你被加强了，快上！"
+			BreakerBladeBuffsTooltip : "你被加强了，快上！"
 		}
 		BuffName:
 		{

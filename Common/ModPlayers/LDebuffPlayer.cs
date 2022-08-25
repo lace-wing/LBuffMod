@@ -180,34 +180,32 @@ namespace LBuffMod.Common.ModPlayers
             //毁灭刃
             if (item.type == ItemID.BreakerBlade)
             {
-                if (item.scale < 4f)
+                if (item.scale < 3f)
                 {
-                    item.scale += 0.2f;
+                    item.scale += 0.15f;
+                    damage += (int)(item.scale * damage * 0.2f);
                 }
-                if (item.scale > 3f || crit)
+                if (target.life >= target.lifeMax * 0.9f)
                 {
-                    damage = (int)(damage * item.scale * 0.5f);
-                }
-                if (target.life <= target.lifeMax * 0.9f)
-                {
-                    target.AddBuff(BuffID.OnFire3, 1800);
-                    target.AddBuff(BuffID.Bleeding, 1800);
-                    damage = (int)(damage * 1.5f);
+                    target.AddBuff(BuffID.OnFire3, 900);
+                    target.AddBuff(BuffID.Bleeding, 900);
+                    damage = (int)(damage * 3.6f);
                     if (crit)
                     {
-                        target.AddBuff(BuffID.Burning, 1800);
-                        target.AddBuff(BuffID.Bleeding, 1800);
+                        target.AddBuff(BuffID.Burning, 900);
+                        target.AddBuff(BuffID.Bleeding, 900);
                     }
                 }
-                if (Main.myPlayer == Player.whoAmI && Main.GameUpdateCount % 20 == 0)
+                if (Main.myPlayer == Player.whoAmI)
                 {
                     bool opp = Main.rand.NextBool();
-                    Vector2 position = target.Center + new Vector2((opp ? 980 : -980) + (opp ? Main.rand.Next(-1960, 0) : Main.rand.Next(0, 1960)), (opp ? 620 : -620) + (opp ? Main.rand.Next(-640, 0) : Main.rand.Next(0, 640)));
-                    Projectile BreakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(Player.Center - position) * 4, ProjectileID.CultistBossFireBall, (int)(damage * 0.8f), item.knockBack * 0.5f, Player.whoAmI);
+                    int sW = Main.screenWidth;
+                    int sH = Main.screenHeight;
+                    Vector2 position = target.Center + new Vector2((opp ? sW * 0.5f : -sW * 0.5f) + (opp ? Main.rand.Next(-sW, 0) : Main.rand.Next(0, sW)), (opp ? sH * 0.5f : -sH * 0.5f) + (opp ? Main.rand.Next(-sH, 0) : Main.rand.Next(0, sH)));
+                    Projectile BreakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(Player.Center - position) * 9, ProjectileID.CultistBossFireBall, (int)(damage * 0.8f), item.knockBack * 0.5f, Player.whoAmI);
                     BreakerBladeFireBall.friendly = true;
                     BreakerBladeFireBall.hostile = false;
                     BreakerBladeFireBall.tileCollide = false;
-                    BreakerBladeFireBall.extraUpdates += 1;
                 }
             }
             //皇家凝胶施加着火
@@ -247,8 +245,8 @@ namespace LBuffMod.Common.ModPlayers
             //拜月邪教徒火球
             if (proj.type == ProjectileID.CultistBossFireBall)
             {
-                target.AddBuff(BuffID.Burning, 60);
-                if (target.life <= target.lifeMax * 0.8f)
+                target.AddBuff(BuffID.Burning, 30);
+                if (target.life >= target.lifeMax * 0.8f)
                 {
                     damage = (int)(damage * 1.5f);
                 }
