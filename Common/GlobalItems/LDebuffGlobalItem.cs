@@ -38,6 +38,7 @@ namespace LBuffMod.Common.GlobalItems
         }
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
+            //Accessories
             if (item.type == ItemID.RoyalGel)
             {
                 tooltips.Add(new(Mod, "RoyalGelFireTooltip", Language.GetTextValue("Mods.LBuffMod.TooltipLines.RoyalGelFireTooltip")));
@@ -49,6 +50,11 @@ namespace LBuffMod.Common.GlobalItems
             if (item.type == ItemID.StingerNecklace)
             {
                 tooltips.Add(new(Mod, "StingerNecklaceBleedingAndPoisonTooltip", Language.GetTextValue("Mods.LBuffMod.TooltipLines.StingerNecklaceBleedingAndPoisonTooltip")));
+            }
+            //Weapons
+            if (item.type == ItemID.BreakerBlade)
+            {
+                tooltips.Add(new(Mod, "BreakerBladeBuffsTooltip", Language.GetTextValue("Mods.LBuffMod.TooltipLines.BreakerBladeBuffsTooltip")));
             }
         }
     }
