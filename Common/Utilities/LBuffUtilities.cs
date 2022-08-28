@@ -67,6 +67,19 @@ namespace LBuffMod.Common.Utilities
             }
             return false;
         }
+        public static int NPCBuffNumInBuffSet(NPC npc, int[] buffSet)
+        {
+            int num = 0;
+            for (int i = 0; i < buffSet.Length; i++)
+            {
+                int buffIndex = npc.FindBuffIndex(buffSet[i]);
+                if (buffIndex != -1)
+                {
+                    num++;
+                }
+            }
+            return num;
+        }
         public static bool PlayerHasBuffInBuffSet(Player player, int[] buffSet)
         {
             for (int i = 0; i < buffSet.Length; i++)

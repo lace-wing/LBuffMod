@@ -17,6 +17,7 @@ namespace LBuffMod.Common.ModPlayers
         public bool stingerNecklaceBleedingAndPoison = false;
         public bool madnessDebuff = false;
         public bool hairdressersWhiteSilkStockings = false;
+        public bool woodArmorSet = false;
         public override void ResetEffects()
         {
             royalGelOnFire = false;
@@ -24,6 +25,7 @@ namespace LBuffMod.Common.ModPlayers
             stingerNecklaceBleedingAndPoison = false;
             madnessDebuff = false;
             hairdressersWhiteSilkStockings = false;
+            woodArmorSet = false;
         }
         public override void UpdateEquips()
         {
@@ -43,9 +45,22 @@ namespace LBuffMod.Common.ModPlayers
                     Player.GetDamage(DamageClass.Magic) += 0.1f;
                     Player.GetDamage(DamageClass.Summon) += 0.1f;
                     Player.GetDamage(DamageClass.Melee) -= 0.1f;
-                    Player.GetDamage(DamageClass.Ranged) -= 0.1f;
+                    Player.GetDamage(DamageClass.Ranged) += 0.1f;
                 }
             }
+            //木套效果
+            if (Player.armor[0].type == ItemID.WoodHelmet && Player.armor[1].type == ItemID.WoodBreastplate && Player.armor[2].type == ItemID.WoodGreaves)
+            {
+                woodArmorSet = true;
+                if (Main.rand.NextBool(180))
+                {
+                    Player.AddBuff(BuffID.DryadsWard, 90);
+                }
+            }
+        }
+        public override void PostUpdateEquips()
+        {
+            base.PostUpdateEquips();
         }
         public override void UpdateBadLifeRegen()
         {
@@ -86,12 +101,16 @@ namespace LBuffMod.Common.ModPlayers
                 }
                 if (Player.velocity != Vector2.Zero && (Player.controlLeft || Player.controlRight || Player.controlJump) && !madnessDebuff)
                 {
-                    int f = Math.Clamp((int)(Vector2.Distance(Player.position, Player.oldPosition) / 4f), 0, 96);
+                    int f = Math.Clamp((int)(Vector2.Distance(Player.position, Player.oldPosition) / 1f), 0, 96);
                     Player.lifeRegen -= f;
+                    if (madnessDebuff && f > 0)
+                    {
+                        Player.lifeRegen += f / 2;
+                    }
                 }
                 if (madnessDebuff)
                 {
-                    Player.lifeRegen += 38;
+                    Player.lifeRegen += 6;
                 }
             }
         }
@@ -183,7 +202,7 @@ namespace LBuffMod.Common.ModPlayers
                 if (item.scale < 3.6f)
                 {
                     item.scale += 0.15f;
-                    damage = (int)(damage / item.scale * 1.8f);
+                    damage = (int)(damage / item.scale * 1.6f);
                 }
                 if (target.life >= target.lifeMax * 0.9f)
                 {
@@ -202,7 +221,7 @@ namespace LBuffMod.Common.ModPlayers
                     int sW = Main.screenWidth;
                     int sH = Main.screenHeight;
                     Vector2 position = target.Center + new Vector2((opp ? sW * 0.5f : -sW * 0.5f) + (opp ? Main.rand.Next(-sW, 0) : Main.rand.Next(0, sW)), (opp ? sH * 0.5f : -sH * 0.5f) + (opp ? Main.rand.Next(-sH, 0) : Main.rand.Next(0, sH)));
-                    Projectile breakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize(Player.Center - position) * 9, ProjectileID.CultistBossFireBall, (int)(damage * 0.6f), item.knockBack * 0.6f, Player.whoAmI);
+                    Projectile breakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize((Player.Center + target.Center) / 2 - position) * 9, ProjectileID.CultistBossFireBall, (int)(damage * 0.8f), item.knockBack * 0.8f, Player.whoAmI);
                     breakerBladeFireBall.friendly = true;
                     breakerBladeFireBall.hostile = false;
                     breakerBladeFireBall.tileCollide = false;
@@ -229,6 +248,11 @@ namespace LBuffMod.Common.ModPlayers
             {
                 Player.AddBuff(BuffID.Electrified, 180);
             }
+            //木套效果
+            if (woodArmorSet)
+            {
+                target.AddBuff(BuffID.DryadsWardDebuff, 120);
+            }
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
@@ -245,10 +269,10 @@ namespace LBuffMod.Common.ModPlayers
             //拜月邪教徒火球
             if (proj.type == ProjectileID.CultistBossFireBall)
             {
-                target.AddBuff(BuffID.Burning, 30);
-                if (target.life >= target.lifeMax * 0.8f)
+                target.AddBuff(BuffID.Burning, 45);
+                if (target.life >= target.lifeMax * 0.7f)
                 {
-                    damage = (int)(damage * 1.5f);
+                    damage = (int)(damage * 2.4f);
                 }
             }
             //皇家凝胶施加着火
@@ -272,6 +296,11 @@ namespace LBuffMod.Common.ModPlayers
             if (madnessDebuff)
             {
                 Player.AddBuff(BuffID.Electrified, 60);
+            }
+            //木套效果
+            if (woodArmorSet)
+            {
+                target.AddBuff(BuffID.DryadsWardDebuff, 60);
             }
         }
     }

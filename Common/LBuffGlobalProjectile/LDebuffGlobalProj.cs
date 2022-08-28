@@ -21,14 +21,14 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
                 {
                     npc = (NPC)source_Parent.Entity;
                 }
-                if (source_Parent.Entity is Item)
-                {
-                    item = (Item)source_Parent.Entity;
-                }
             }
         }
         public override void OnHitPlayer(Projectile projectile, Player target, int damage, bool crit)
         {
+            if (npc == null)
+            {
+                return;
+            }
             #region Pre-hard Mode projs inflicting damaging debuffs
             //哥布林鲨、血鱿鱼、恐惧鹦鹉螺
             if (npc.type == NPCID.GoblinShark || npc.type == NPCID.BloodSquid || npc.type == NPCID.BloodNautilus)

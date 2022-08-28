@@ -30,7 +30,11 @@ namespace LBuffMod.Content.Items.Weapons
         }
         public override void OnHitNPC(Player player, NPC target, int damage, float knockBack, bool crit)
         {
-            target.AddBuff(BuffID.Electrified, 600);
+            //target.AddBuff(BuffID.Electrified, 600);
+            for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
+            {
+                target.AddBuff(LBuffUtils.thermalDebuffs[i], 1200);
+            }
         }
         public override bool AltFunctionUse(Player player)
         {
@@ -38,9 +42,9 @@ namespace LBuffMod.Content.Items.Weapons
         }
         public override bool? UseItem(Player player)
         {
-            player.AddBuff(BuffID.Electrified, 600);
+            /*player.AddBuff(BuffID.Electrified, 600);
             player.AddBuff(ModContent.BuffType<Madness>(), 60000);
-            Main.NewText(player.lifeRegen);
+            Main.NewText(player.lifeRegen);*/
             return base.UseItem(player);
         }
     }

@@ -55,7 +55,7 @@ namespace LBuffMod.Common.GlobalNPCs
             //带电真的根据速度掉血了
             if (npc.HasBuff(BuffID.Electrified))
             {
-                int f = Math.Clamp((int)(Vector2.Distance(npc.position, npc.oldPosition) * 25f), 8, 1024);
+                int f = Math.Clamp((int)(Vector2.Distance(npc.position, npc.oldPosition) * 12f), 8, 1024);
                 npc.lifeRegen -= f;
                 damage += f;
                 /*if (Main.rand.NextBool(2))
@@ -152,7 +152,6 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void PostAI(NPC npc)
         {
-            //Main.NewText(Main.GameUpdateCount % 60);
             if (npc.type == NPCID.BrainofCthulhu)
             {
                 npc.AddBuff(BuffID.Bleeding, 60);
@@ -163,12 +162,16 @@ namespace LBuffMod.Common.GlobalNPCs
             {
                 int bX = (int)npc.BottomLeft.X / 16 + i;
                 int bY = (int)npc.BottomLeft.Y / 16;
+                bX = Math.Clamp(bX, 0, Main.maxTilesX);
+                bY = Math.Clamp(bY, 0, Main.maxTilesY);
                 Tile tileSteppingOn = Main.tile[bX, bY];
                 if (tileSteppingOn.HasUnactuatedTile && Main.tileSolid[tileSteppingOn.TileType] && (tileSteppingOn.TileType == TileID.Meteorite || tileSteppingOn.TileType == TileID.Hellstone || tileSteppingOn.TileType == TileID.HellstoneBrick))
                 {
                     npc.AddBuff(BuffID.Burning, 60);//为什么每次update只+5？
                 }
             }
+            int j = LBuffUtils.NPCBuffNumInBuffSet(npc, LBuffUtils.thermalDebuffs);
+            npc.position -= npc.velocity * 0.05f * j;
         }
         public override void OnHitPlayer(NPC npc, Player target, int damage, bool crit)
         {
