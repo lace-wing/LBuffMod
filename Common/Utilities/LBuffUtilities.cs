@@ -91,6 +91,19 @@ namespace LBuffMod.Common.Utilities
             }
             return false;
         }
+        public static int PlayerBuffNumInBuffSet(Player player, int[] buffSet)
+        {
+            int num = 0;
+            for (int j = 0; j < buffSet.Length; j++)
+            {
+                int buffIndex = player.FindBuffIndex(buffSet[j]);
+                if (buffIndex != -1)
+                {
+                    num++;
+                }
+            }
+            return num;
+        }
         public static int BuffIDToLifeRegen(int buffID)
         {
             switch (buffID)

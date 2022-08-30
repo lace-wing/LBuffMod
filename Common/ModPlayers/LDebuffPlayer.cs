@@ -45,7 +45,7 @@ namespace LBuffMod.Common.ModPlayers
                     Player.GetDamage(DamageClass.Magic) += 0.1f;
                     Player.GetDamage(DamageClass.Summon) += 0.1f;
                     Player.GetDamage(DamageClass.Melee) -= 0.1f;
-                    Player.GetDamage(DamageClass.Ranged) += 0.1f;
+                    Player.GetDamage(DamageClass.Ranged) -= 0.1f;
                 }
             }
             //木套效果
@@ -56,6 +56,85 @@ namespace LBuffMod.Common.ModPlayers
                 {
                     Player.AddBuff(BuffID.DryadsWard, 90);
                 }
+                Player.moveSpeed += 0.2f;
+                Player.noFallDmg = true;
+            }
+            //红木套效果
+            if (Player.armor[0].type == ItemID.RichMahoganyHelmet && Player.armor[1].type == ItemID.RichMahoganyBreastplate && Player.armor[2].type == ItemID.RichMahoganyGreaves)
+            {
+                woodArmorSet = true;
+                if (Main.rand.NextBool(120))
+                {
+                    Player.AddBuff(BuffID.DryadsWard, 90);
+                }
+                Player.buffImmune[BuffID.Poisoned] = true;
+                Player.lifeForce = true;
+            }
+            //针叶木效果
+            if (Player.armor[0].type == ItemID.BorealWoodHelmet && Player.armor[1].type == ItemID.BorealWoodBreastplate && Player.armor[2].type == ItemID.BorealWoodGreaves)
+            {
+                woodArmorSet = true;
+                if (Main.rand.NextBool(180))
+                {
+                    Player.AddBuff(BuffID.DryadsWard, 90);
+                }
+                Player.buffImmune[BuffID.Chilled] = true;
+                Player.statDefense += 4;
+                Player.noKnockback = true;
+            }
+            //棕榈木套效果
+            if (Player.armor[0].type == ItemID.PalmWoodHelmet && Player.armor[1].type == ItemID.PalmWoodBreastplate && Player.armor[2].type == ItemID.PalmWoodGreaves)
+            {
+                woodArmorSet = true;
+                if (Main.rand.NextBool(180))
+                {
+                    Player.AddBuff(BuffID.DryadsWard, 90);
+                }
+                Player.buffImmune[BuffID.Wet] = true;
+                Player.fishingSkill += 25;
+                Player.hasFloatingTube = true;
+            }
+            //黑檀木套效果
+            if (Player.armor[0].type == ItemID.EbonwoodHelmet && Player.armor[1].type == ItemID.EbonwoodBreastplate && Player.armor[2].type == ItemID.EbonwoodGreaves)
+            {
+                woodArmorSet = true;
+                Player.buffImmune[BuffID.OnFire] = true;
+                Player.buffImmune[BuffID.CursedInferno] = true;
+                Player.wingTimeMax += 30;
+            }
+            //暗影木套效果
+            if (Player.armor[0].type == ItemID.ShadewoodHelmet && Player.armor[1].type == ItemID.ShadewoodBreastplate && Player.armor[2].type == ItemID.ShadewoodGreaves)
+            {
+                woodArmorSet = true;
+                Player.buffImmune[BuffID.OnFire] = true;
+                Player.GetDamage(DamageClass.Generic) += 0.15f;
+                if (Player.lifeRegen >= 2)
+                {
+                    Player.lifeRegen -= 2;
+                }
+            }
+            //珍珠木套效果
+            if (Player.armor[0].type == ItemID.PearlwoodHelmet && Player.armor[1].type == ItemID.PearlwoodBreastplate && Player.armor[2].type == ItemID.PearlwoodGreaves)
+            {
+                woodArmorSet = true;
+                Player.buffImmune[BuffID.Frostburn] = true;
+                Player.AddBuff(BuffID.DryadsWard, 90);
+                Player.statDefense += 8;
+                Player.statManaMax2 += 30;
+                Player.wingTimeMax += 60;
+            }
+            //阴森木套效果
+            if (Player.armor[0].type == ItemID.SpookyHelmet && Player.armor[1].type == ItemID.SpookyBreastplate && Player.armor[2].type == ItemID.SpookyLeggings)
+            {
+                woodArmorSet = true;
+                Player.buffImmune[BuffID.ShadowFlame] = true;
+                Player.whipRangeMultiplier += 0.15f;
+            }
+            //所有木套效果
+            if (woodArmorSet)
+            {
+                Player.statDefense += 2;
+                Player.moveSpeed *= 1.05f;
             }
         }
         public override void PostUpdateEquips()
@@ -149,7 +228,7 @@ namespace LBuffMod.Common.ModPlayers
             {
                 if (damage >= 4)
                 {
-                    Player.AddBuff(BuffID.Electrified, 900);
+                    Player.AddBuff(BuffID.Electrified, 600);
                     Player.AddBuff(ModContent.BuffType<Madness>(), 360);
                 }
             }
