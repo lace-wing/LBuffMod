@@ -16,13 +16,13 @@
 			BreakerBladeBuffsTooltip : "LBuffMod：基础大小和造成的伤害提升\n对90%血量及以上的敌人造成更高伤害并附加灼烧与流血\n命中敌人使毁灭刃变大，伤害降低并召唤火球\n火球对80%血量及以上的敌人造成更高伤害并短暂施加灼烧"
 			BloodWeaponsTooltip : "施加流血"
 			#盔甲
-			WoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，时不时获得树妖庇护\n移动速度+20%且无摔落伤害"
-			RichMahoganyHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，经常获得树妖庇护\n获得生命力且免疫中毒"
-			BorealWoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，时不时获得树妖庇护\n防御+4且免疫击退和寒冷"
-			PalmWoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，时不时获得树妖庇护\n渔力+25，获得浮游圈效果且免疫潮湿"
-			EbonwoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害\n飞行时间小幅度增加且免疫着火了！和诅咒焰"
+			WoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，时不时获得树妖庇护\n移动速度+35%且无摔落伤害"
+			RichMahoganyHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，经常获得树妖庇护\n生命上限+30且免疫中毒\n若身处丛林则伤害+15%"
+			BorealWoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，时不时获得树妖庇护\n防御+4且免疫击退和寒冷\n若身处雪原则移动速度+25%"
+			PalmWoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，时不时获得树妖庇护\n渔力+33，获得浮游圈效果且免疫潮湿\n若身处海洋则能进行海啸跳跃"
+			EbonwoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害\n飞行时间小幅度增加且免疫着火了！和诅咒焰\n若身处腐化则盔甲穿透+8"
 			ShadewoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害\n伤害+15%且免疫着火了！\n但生命回复略微减少"
-			PearlwoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，持续获得树妖庇护\n魔力上限+30，防御+8，飞行时间中等幅度增加且免疫霜火"
+			PearlwoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，持续获得树妖庇护\n伤害+15%，魔力上限+60，防御+8，飞行时间中等幅度增加且免疫霜火"
 			SpookyHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害\n鞭长+15%且免疫暗影焰"
 		}
 		BuffName:
