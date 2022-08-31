@@ -12,7 +12,9 @@ namespace LBuffMod.Common.ModPlayers
     public class LDebuffPlayer : ModPlayer
     {
         public bool royalGelOnFire = false;
-        public static int royalGelFireDamage = -6;
+        public int royalGelFireDamage = -6;
+        public bool volatileGelatinFireNOil = false;
+        public int volatileGelatinFireDamage = -12;
         public bool sharkToothNecklaceBleeding = false;
         public bool stingerNecklaceBleedingAndPoison = false;
         public bool madnessDebuff = false;
@@ -24,6 +26,7 @@ namespace LBuffMod.Common.ModPlayers
         public override void ResetEffects()
         {
             royalGelOnFire = false;
+            volatileGelatinFireNOil = false;
             sharkToothNecklaceBleeding = false;
             stingerNecklaceBleedingAndPoison = false;
             madnessDebuff = false;
@@ -35,10 +38,6 @@ namespace LBuffMod.Common.ModPlayers
         }
         public override void UpdateEquips()
         {
-            if (royalGelOnFire)//皇家凝胶降伤
-            {
-                Player.GetDamage(DamageClass.Generic) -= 0.2f;
-            }
             if (madnessDebuff)//发电提升属性
             {
                 Player.statLifeMax2 += 30;
@@ -402,6 +401,12 @@ namespace LBuffMod.Common.ModPlayers
             {
                 target.AddBuff(BuffID.OnFire, 120);
             }
+            //挥发明胶施加霜火与涂油
+            if (volatileGelatinFireNOil)
+            {
+                target.AddBuff(BuffID.Oiled, 180);
+                target.AddBuff(BuffID.Frostburn, 180);
+            }
             //鲨牙项链施加流血
             if (sharkToothNecklaceBleeding)
             {
@@ -427,7 +432,7 @@ namespace LBuffMod.Common.ModPlayers
             if (crimsonSetBonus)
             {
                 target.AddBuff(BuffID.Bleeding, 45);
-                Player.AddBuff(BuffID.Bleeding, 15);
+                Player.AddBuff(BuffID.Bleeding, 10);
                 if (target.HasBuff(BuffID.Bleeding) && Player.HasBuff(BuffID.Bleeding))
                 {
                     int lS = 1;
@@ -461,11 +466,22 @@ namespace LBuffMod.Common.ModPlayers
                     damage = (int)(damage * 2.4f);
                 }
             }
+            //挥发明胶射弹
+            if (proj.type == ProjectileID.VolatileGelatinBall)
+            {
+                proj.damage += 100;
+                target.AddBuff(BuffID.Oiled, 180);
+            }
             //皇家凝胶施加着火
             if (royalGelOnFire)
             {
                 target.AddBuff(BuffID.OnFire, 60);
-                //target.AddBuff(BuffID.Electrified, 180);
+            }
+            //挥发明胶施加霜火与涂油
+            if (volatileGelatinFireNOil)
+            {
+                target.AddBuff(BuffID.Oiled, 90);
+                target.AddBuff(BuffID.Frostburn, 90);
             }
             //鲨牙项链施加流血
             if (sharkToothNecklaceBleeding)

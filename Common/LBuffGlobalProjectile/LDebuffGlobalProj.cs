@@ -11,6 +11,7 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
     {
         public override bool InstancePerEntity => true;
         public NPC npc;
+        public Player player;
         public Item item;
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
@@ -21,9 +22,17 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
                 {
                     npc = (NPC)source_Parent.Entity;
                 }
+                if (source_Parent.Entity is Player)
+                {
+                    player = (Player)source_Parent.Entity;
+                }
+                if (source_Parent.Entity is Item)
+                {
+                    item = (Item)source_Parent.Entity;
+                }
             }
         }
-        public override void OnHitPlayer(Projectile projectile, Player target, int damage, bool crit)
+        public override void ModifyHitPlayer(Projectile projectile, Player target, ref int damage, ref bool crit)
         {
             if (npc == null)
             {

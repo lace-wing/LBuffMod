@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Steamworks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,6 +62,17 @@ namespace LBuffMod.Common.Utilities
             for (int i = 0; i < buffSet.Length; i++)
             {
                 if (npc.HasBuff(buffSet[i]))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static bool NPCHasTheBuffInBuffSet(NPC npc, int buffType, int[] buffSet)
+        {
+            for (int i = 0; i < buffSet.Length; i++)
+            {
+                if (buffType == buffSet[i])
                 {
                     return true;
                 }

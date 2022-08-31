@@ -15,6 +15,12 @@
 				你的攻击施加着火了！
 				附近的敌人受到的来自常规火焰的伤害增加
 				'''
+			VolatileGelatinFireNOil : 
+				'''
+				降低10%伤害
+				你的攻击施加霜火与涂油
+				明胶球的伤害提升
+				'''
 			SharkToothNecklaceBleedingTooltip : "你的攻击施加流血"
 			StingerNecklaceBleedingAndPoisonTooltip : "你的攻击施加流血和中毒"
 			#武器

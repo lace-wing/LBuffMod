@@ -14,6 +14,7 @@ namespace LBuffMod.Common.GlobalItems
         {
             if (item.type == ItemID.RoyalGel)
             {
+                player.GetDamage(DamageClass.Generic) -= 0.2f;
                 player.GetModPlayer<LDebuffPlayer>().royalGelOnFire = true;
             }
             if (item.type == ItemID.SharkToothNecklace)
@@ -23,6 +24,11 @@ namespace LBuffMod.Common.GlobalItems
             if (item.type == ItemID.SweetheartNecklace)
             {
                 player.GetModPlayer<LDebuffPlayer>().stingerNecklaceBleedingAndPoison = true;
+            }
+            if (item.type == ItemID.VolatileGelatin)
+            {
+                player.GetDamage(DamageClass.Generic) -= 0.1f;
+                player.GetModPlayer<LDebuffPlayer>().volatileGelatinFireNOil = true;
             }
         }
         public override void UpdateInventory(Item item, Player player)
@@ -46,6 +52,10 @@ namespace LBuffMod.Common.GlobalItems
             if (item.type == ItemID.RoyalGel)
             {
                 tooltips.Add(new(Mod, "RoyalGelFireTooltip", Language.GetTextValue("Mods.LBuffMod.TooltipLine.RoyalGelFireTooltip")));
+            }
+            if (item.type == ItemID.VolatileGelatin)
+            {
+                tooltips.Add(new(Mod, "VolatileGelatinFireNOil", Language.GetTextValue("Mods.LBuffMod.TooltipLine.VolatileGelatinFireNOil")));
             }
             if (item.type == ItemID.SharkToothNecklace)
             {
