@@ -13,7 +13,9 @@ namespace LBuffMod.Common.GlobalNPCs
         public override bool InstancePerEntity => true;
 
         public bool royalGelNearby = false;
+        public int totalRoyalGelFireDamage = 0;
         public bool volatilegeltinNearby = false;
+        public int totalVolatileGelatinFireDamage = 0;
         public override void ResetEffects(NPC npc)
         {
             royalGelNearby = false;
@@ -21,6 +23,24 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
+            //检测皇家凝胶常规火焰增伤
+            for (int i = 0; i < Main.player.Length; i++)
+            {
+                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelOnFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
+                {
+                    royalGelNearby = true;
+                    totalRoyalGelFireDamage += Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelFireDamage;
+                }
+            }
+            //检测挥发明胶火焰增伤
+            for (int i = 0; i < Main.player.Length; i++)
+            {
+                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFireNOil && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
+                {
+                    volatilegeltinNearby = true;
+                    totalVolatileGelatinFireDamage += Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFireDamage;
+                }
+            }
             //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
             for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
             {
@@ -32,14 +52,16 @@ namespace LBuffMod.Common.GlobalNPCs
                     {
                         if (royalGelNearby)//皇家凝胶常规火焰增伤
                         {
-                            additionalDamage += ;
+                            additionalDamage += (int)(totalRoyalGelFireDamage * MathHelper.Lerp(1f, 6f, npc.buffTime[buffIndex] / 43200f));
+                            additionalDamage = (int)(additionalDamage * 1.2f);
                         }
                     }
                     if (LBuffUtils.NPCHasTheBuffInBuffSet(npc, LBuffUtils.lDamagingDebuffs[i], LBuffUtils.thermalDebuffs))//是火
                     {
                         if (royalGelNearby)//挥发明胶火焰增伤
                         {
-                            additionalDamage += LDebuffPlayer.volatileGelatinFireDamage;
+                            additionalDamage += (int)(totalVolatileGelatinFireDamage * MathHelper.Lerp(1f, 6f, npc.buffTime[buffIndex] / 43200f));
+                            additionalDamage = (int)(additionalDamage * 1.5f);
                         }
                     }
                     npc.lifeRegen += additionalDamage;
@@ -86,22 +108,6 @@ namespace LBuffMod.Common.GlobalNPCs
                     Dust dust = Dust.NewDustDirect(npc.BottomLeft, npc.width, npc.height, DustID.Electric, npc.velocity.X * 0.8f, npc.velocity.Y * 0.8f);
                     dust.scale *= 0.1f;
                 }*/
-            }
-            //检测皇家凝胶常规火焰增伤
-            for (int i = 0; i < Main.player.Length; i++)
-            {
-                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelOnFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
-                {
-                    royalGelNearby = true;
-                }
-            }
-            //挥发明胶火焰增伤
-            for (int i = 0; i < Main.player.Length; i++)
-            {
-                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFireNOil && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
-                {
-                    volatilegeltinNearby = true;
-                }
             }
         }
         public override void ModifyHitByItem(NPC npc, Player player, Item item, ref int damage, ref float knockback, ref bool crit)
