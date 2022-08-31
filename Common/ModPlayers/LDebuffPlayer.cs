@@ -13,8 +13,10 @@ namespace LBuffMod.Common.ModPlayers
     {
         public bool royalGelOnFire = false;
         public int royalGelFireDamage = -6;
+        public float royalGelFireDamageMultiplier = 0.2f;
         public bool volatileGelatinFireNOil = false;
         public int volatileGelatinFireDamage = -12;
+        public float volatileGelatinFireDamageMultiplier = 0.5f;
         public bool sharkToothNecklaceBleeding = false;
         public bool stingerNecklaceBleedingAndPoison = false;
         public bool madnessDebuff = false;
@@ -74,15 +76,16 @@ namespace LBuffMod.Common.ModPlayers
             if (Player.armor[0].type == ItemID.RichMahoganyHelmet && Player.armor[1].type == ItemID.RichMahoganyBreastplate && Player.armor[2].type == ItemID.RichMahoganyGreaves)
             {
                 woodArmorSet = true;
+                dryadsWardOnHit = true;
                 if (Main.rand.NextBool(120))
                 {
                     Player.AddBuff(BuffID.DryadsWard, 90);
                 }
                 Player.buffImmune[BuffID.Poisoned] = true;
-                Player.statLifeMax2 += 30;
+                Player.statLifeMax2 += 40;
                 if (Player.ZoneJungle)
                 {
-                    Player.GetDamage(DamageClass.Generic) += 0.15f;
+                    Player.GetAttackSpeed(DamageClass.Generic) += 0.10f;
                     Player.jumpBoost = true;
                     Player.jumpSpeedBoost += 0.2f;
                 }
@@ -124,17 +127,16 @@ namespace LBuffMod.Common.ModPlayers
             {
                 woodArmorSet = true;
                 corruptionSetBonus = true;
-                dryadsWardOnHit = true;
                 Player.buffImmune[BuffID.OnFire] = true;
                 Player.buffImmune[BuffID.CursedInferno] = true;
-                Player.wingTimeMax += 45;
+                Player.wingTimeMax += 30;
                 if (Player.equippedWings == null)
                 {
                     Player.wingsLogic = 1;
                 }
                 if (Player.ZoneCorrupt)
                 {
-                    Player.statDefense += 6;
+                    Player.statDefense += 2;
                 }
             }
             //暗影木套效果
@@ -175,8 +177,10 @@ namespace LBuffMod.Common.ModPlayers
                 Player.statDefense += 8;
                 Player.statManaMax2 += 60;
                 Player.GetDamage(DamageClass.Generic) += 0.25f;
-                Player.moveSpeed += 0.2f;
-                Player.wingTimeMax += 90;
+                Player.GetAttackSpeed(DamageClass.Generic) += 0.15f;
+                Player.maxMinions += 2;
+                Player.moveSpeed += 0.25f;
+                Player.wingTimeMax += 60;
                 if (Player.equippedWings == null)
                 {
                     Player.wingsLogic = 1;
@@ -298,9 +302,9 @@ namespace LBuffMod.Common.ModPlayers
             //腐化套装效果
             if (corruptionSetBonus)
             {
-                for (int i = 1; i < 4; i++)
+                for (int i = 1; i < 3; i++)
                 {
-                    Projectile cursedProj = Projectile.NewProjectileDirect(Player.GetSource_OnHurt(npc), Player.Center, (npc.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (damage + 9), 6f, Player.whoAmI);
+                    Projectile cursedProj = Projectile.NewProjectileDirect(Player.GetSource_OnHurt(npc), Player.Center, (npc.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (int)(damage * 0.4f), 4f, Player.whoAmI);
                 }
                 npc.AddBuff(BuffID.CursedInferno, 30);
             }
@@ -352,9 +356,9 @@ namespace LBuffMod.Common.ModPlayers
             //腐化套装效果
             if (corruptionSetBonus)
             {
-                for (int i = 1; i < 4; i++)
+                for (int i = 1; i < 3; i++)
                 {
-                    Projectile cursedProj = Projectile.NewProjectileDirect(Player.GetSource_OnHurt(proj), Player.Center, (proj.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (damage + 9), 6f, Player.whoAmI);
+                    Projectile cursedProj = Projectile.NewProjectileDirect(Player.GetSource_OnHurt(proj), Player.Center, (proj.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (int)(damage * 0.4f), 4f, Player.whoAmI);
                 }
             }
             //受击时获得树妖庇护
@@ -436,9 +440,13 @@ namespace LBuffMod.Common.ModPlayers
                 if (target.HasBuff(BuffID.Bleeding) && Player.HasBuff(BuffID.Bleeding))
                 {
                     int lS = 1;
-                    if (target.buffTime[target.FindBuffIndex(BuffID.Bleeding)] >= 1200 && Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] >= 900)
+                    if (target.buffTime[target.FindBuffIndex(BuffID.Bleeding)] >= 900)
                     {
-                        lS = 2;
+                        lS += 1;
+                    }
+                    if (Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] >= 1200)
+                    {
+                        lS += 1;
                     }
                     Player.statLife += lS;
                     Player.HealEffect(lS);
@@ -469,8 +477,13 @@ namespace LBuffMod.Common.ModPlayers
             //挥发明胶射弹
             if (proj.type == ProjectileID.VolatileGelatinBall)
             {
-                proj.damage += 100;
+                damage *= 2;
                 target.AddBuff(BuffID.Oiled, 180);
+                proj.extraUpdates += 1;
+                if (Main.rand.NextBool(2))
+                {
+                    proj.penetrate += 1;
+                }
             }
             //皇家凝胶施加着火
             if (royalGelOnFire)
@@ -510,13 +523,17 @@ namespace LBuffMod.Common.ModPlayers
                 if (proj.DamageType == DamageClass.Melee || proj.DamageType == DamageClass.MeleeNoSpeed || proj.DamageType == DamageClass.SummonMeleeSpeed)
                 {
                     target.AddBuff(BuffID.Bleeding, 45);
-                    Player.AddBuff(BuffID.Bleeding, 15);
+                    Player.AddBuff(BuffID.Bleeding, 10);
                     if (target.HasBuff(BuffID.Bleeding) && Player.HasBuff(BuffID.Bleeding))
                     {
                         int lS = 1;
-                        if (target.buffTime[target.FindBuffIndex(BuffID.Bleeding)] >= 1200 && Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] >= 900)
+                        if (target.buffTime[target.FindBuffIndex(BuffID.Bleeding)] >= 900)
                         {
-                            lS = 2;
+                            lS += 1;
+                        }
+                        if (Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] >= 1200)
+                        {
+                            lS += 1;
                         }
                         Player.statLife += lS;
                         Player.HealEffect(lS);
