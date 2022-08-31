@@ -18,6 +18,9 @@ namespace LBuffMod.Common.ModPlayers
         public bool madnessDebuff = false;
         public bool hairdressersWhiteSilkStockings = false;
         public bool woodArmorSet = false;
+        public bool corruptionSetBonus = false;
+        public bool crimsonSetBonus = false;
+        public bool dryadsWardOnHit = false;
         public override void ResetEffects()
         {
             royalGelOnFire = false;
@@ -26,6 +29,9 @@ namespace LBuffMod.Common.ModPlayers
             madnessDebuff = false;
             hairdressersWhiteSilkStockings = false;
             woodArmorSet = false;
+            corruptionSetBonus = false;
+            crimsonSetBonus = false;
+            dryadsWardOnHit = false;
         }
         public override void UpdateEquips()
         {
@@ -48,17 +54,22 @@ namespace LBuffMod.Common.ModPlayers
                     Player.GetDamage(DamageClass.Ranged) -= 0.1f;
                 }
             }
-            //TODO 完善各类木套的效果
+            //TODO Balance needed
             //木套效果
             if (Player.armor[0].type == ItemID.WoodHelmet && Player.armor[1].type == ItemID.WoodBreastplate && Player.armor[2].type == ItemID.WoodGreaves)
             {
                 woodArmorSet = true;
+                dryadsWardOnHit = true;
                 if (Main.rand.NextBool(180))
                 {
                     Player.AddBuff(BuffID.DryadsWard, 90);
                 }
-                Player.moveSpeed += 0.35f;
+                Player.moveSpeed += 0.25f;
                 Player.noFallDmg = true;
+                if (Player.ZoneForest)
+                {
+                    Player.moveSpeed += 0.15f;
+                }
             }
             //红木套效果
             if (Player.armor[0].type == ItemID.RichMahoganyHelmet && Player.armor[1].type == ItemID.RichMahoganyBreastplate && Player.armor[2].type == ItemID.RichMahoganyGreaves)
@@ -73,6 +84,8 @@ namespace LBuffMod.Common.ModPlayers
                 if (Player.ZoneJungle)
                 {
                     Player.GetDamage(DamageClass.Generic) += 0.15f;
+                    Player.jumpBoost = true;
+                    Player.jumpSpeedBoost += 0.2f;
                 }
             }
             //针叶木效果
@@ -102,7 +115,7 @@ namespace LBuffMod.Common.ModPlayers
                 Player.buffImmune[BuffID.Wet] = true;
                 Player.fishingSkill += 33;
                 Player.canFloatInWater = true;
-                if (Player.ZoneBeach)
+                if (Player.ZoneBeach || Player.ZoneDesert)
                 {
                     Player.hasJumpOption_Sail = true;
                 }
@@ -111,6 +124,8 @@ namespace LBuffMod.Common.ModPlayers
             if (Player.armor[0].type == ItemID.EbonwoodHelmet && Player.armor[1].type == ItemID.EbonwoodBreastplate && Player.armor[2].type == ItemID.EbonwoodGreaves)
             {
                 woodArmorSet = true;
+                corruptionSetBonus = true;
+                dryadsWardOnHit = true;
                 Player.buffImmune[BuffID.OnFire] = true;
                 Player.buffImmune[BuffID.CursedInferno] = true;
                 Player.wingTimeMax += 45;
@@ -120,22 +135,32 @@ namespace LBuffMod.Common.ModPlayers
                 }
                 if (Player.ZoneCorrupt)
                 {
-                    Player.GetArmorPenetration(DamageClass.Generic) += 8f;
+                    Player.statDefense += 6;
                 }
             }
             //暗影木套效果
             if (Player.armor[0].type == ItemID.ShadewoodHelmet && Player.armor[1].type == ItemID.ShadewoodBreastplate && Player.armor[2].type == ItemID.ShadewoodGreaves)
             {
                 woodArmorSet = true;
+                crimsonSetBonus = true;
                 Player.buffImmune[BuffID.OnFire] = true;
-                Player.GetDamage(DamageClass.Generic) += 0.15f;
+                Player.GetDamage(DamageClass.Generic) += 0.1f;
                 if (Player.lifeRegen >= 2)
                 {
                     Player.lifeRegen -= 2;
                 }
+                if (Player.lifeRegen < 2)
+                {
+                    Player.lifeRegen -= 1;
+                }
+                if (Player.HasBuff(BuffID.Bleeding))
+                {
+                    Player.GetAttackSpeed(DamageClass.Melee) += 0.15f;
+                    Player.GetAttackSpeed(DamageClass.SummonMeleeSpeed) += 0.15f;
+                }
                 if (Player.ZoneCrimson)
                 {
-                    Player.GetDamage(DamageClass.Generic) += 0.25f;
+                    Player.GetDamage(DamageClass.Generic) += 0.15f;
                     if (!Player.HasBuff(BuffID.Bleeding) || (Player.HasBuff(BuffID.Bleeding) && Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] < 45))
                     {
                         Player.AddBuff(BuffID.Bleeding, 15);
@@ -150,11 +175,16 @@ namespace LBuffMod.Common.ModPlayers
                 Player.AddBuff(BuffID.DryadsWard, 90);
                 Player.statDefense += 8;
                 Player.statManaMax2 += 60;
-                Player.GetDamage(DamageClass.Generic) += 0.15f;
+                Player.GetDamage(DamageClass.Generic) += 0.25f;
+                Player.moveSpeed += 0.2f;
                 Player.wingTimeMax += 90;
                 if (Player.equippedWings == null)
                 {
                     Player.wingsLogic = 1;
+                }
+                if (Player.ZoneHallow)
+                {
+                    Player.endurance += 0.24f;
                 }
             }
             //阴森木套效果
@@ -168,7 +198,7 @@ namespace LBuffMod.Common.ModPlayers
             if (woodArmorSet)
             {
                 Player.statDefense += 2;
-                Player.moveSpeed *= 1.05f;
+                Player.moveSpeed *= 1.1f;
             }
         }
         public override void PostUpdateEquips()
@@ -266,6 +296,20 @@ namespace LBuffMod.Common.ModPlayers
                     Player.AddBuff(ModContent.BuffType<Madness>(), 360);
                 }
             }
+            //腐化套装效果
+            if (corruptionSetBonus)
+            {
+                for (int i = 1; i < 4; i++)
+                {
+                    Projectile cursedProj = Projectile.NewProjectileDirect(Player.GetSource_OnHurt(npc), Player.Center, (npc.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (damage + 9), 6f, Player.whoAmI);
+                }
+                npc.AddBuff(BuffID.CursedInferno, 30);
+            }
+            //受击时获得树妖庇护
+            if (dryadsWardOnHit)
+            {
+                Player.AddBuff(BuffID.DryadsWard, 180);
+            }
         }
         public override void ModifyHitByProjectile(Projectile proj, ref int damage, ref bool crit)
         {
@@ -305,6 +349,19 @@ namespace LBuffMod.Common.ModPlayers
                     Player.AddBuff(BuffID.Electrified, 900);
                     Player.AddBuff(ModContent.BuffType<Madness>(), 360);
                 }
+            }
+            //腐化套装效果
+            if (corruptionSetBonus)
+            {
+                for (int i = 1; i < 4; i++)
+                {
+                    Projectile cursedProj = Projectile.NewProjectileDirect(Player.GetSource_OnHurt(proj), Player.Center, (proj.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (damage + 9), 6f, Player.whoAmI);
+                }
+            }
+            //受击时获得树妖庇护
+            if (dryadsWardOnHit)
+            {
+                Player.AddBuff(BuffID.DryadsWard, 180);
             }
         }
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit)
@@ -366,6 +423,22 @@ namespace LBuffMod.Common.ModPlayers
             {
                 target.AddBuff(BuffID.DryadsWardDebuff, 120);
             }
+            //血腥套效果
+            if (crimsonSetBonus)
+            {
+                target.AddBuff(BuffID.Bleeding, 45);
+                Player.AddBuff(BuffID.Bleeding, 15);
+                if (target.HasBuff(BuffID.Bleeding) && Player.HasBuff(BuffID.Bleeding))
+                {
+                    int lS = 1;
+                    if (target.buffTime[target.FindBuffIndex(BuffID.Bleeding)] >= 1200 && Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] >= 900)
+                    {
+                        lS = 2;
+                    }
+                    Player.statLife += lS;
+                    Player.HealEffect(lS);
+                }
+            }
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
@@ -414,6 +487,25 @@ namespace LBuffMod.Common.ModPlayers
             if (woodArmorSet)
             {
                 target.AddBuff(BuffID.DryadsWardDebuff, 60);
+            }
+            //血腥套效果
+            if (crimsonSetBonus)
+            {
+                if (proj.DamageType == DamageClass.Melee || proj.DamageType == DamageClass.MeleeNoSpeed || proj.DamageType == DamageClass.SummonMeleeSpeed)
+                {
+                    target.AddBuff(BuffID.Bleeding, 45);
+                    Player.AddBuff(BuffID.Bleeding, 15);
+                    if (target.HasBuff(BuffID.Bleeding) && Player.HasBuff(BuffID.Bleeding))
+                    {
+                        int lS = 1;
+                        if (target.buffTime[target.FindBuffIndex(BuffID.Bleeding)] >= 1200 && Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] >= 900)
+                        {
+                            lS = 2;
+                        }
+                        Player.statLife += lS;
+                        Player.HealEffect(lS);
+                    }
+                }
             }
         }
     }
