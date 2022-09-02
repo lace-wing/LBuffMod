@@ -99,11 +99,11 @@ namespace LBuffMod.Common.GlobalNPCs
                 }
                 npc.lifeRegen += LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
                 damage -= LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
-                /*if (Main.rand.NextBool(2))
+                if (Main.rand.NextBool(3))
                 {
-                    Dust dust = Dust.NewDustDirect(npc.BottomLeft, npc.width, npc.height, DustID.FlameBurst);
-                    dust.scale *= 0.5f;
-                }*/
+                    Dust dust = Dust.NewDustDirect(npc.TopLeft, npc.width, npc.height, DustID.SolarFlare, npc.velocity.X * 0.1f, npc.velocity.Y * 0.1f, 128);
+                    //dust.
+                }
             }
             //带电真的根据速度掉血了
             if (npc.HasBuff(BuffID.Electrified))
@@ -111,11 +111,10 @@ namespace LBuffMod.Common.GlobalNPCs
                 int f = Math.Clamp((int)(Vector2.Distance(npc.position, npc.oldPosition) * 12f), 8, 1024);
                 npc.lifeRegen -= f;
                 damage += f;
-                /*if (Main.rand.NextBool(2))
+                if (Main.rand.NextBool(3))
                 {
-                    Dust dust = Dust.NewDustDirect(npc.BottomLeft, npc.width, npc.height, DustID.Electric, npc.velocity.X * 0.8f, npc.velocity.Y * 0.8f);
-                    dust.scale *= 0.1f;
-                }*/
+                    Dust dust = Dust.NewDustDirect(npc.TopLeft, npc.width, npc.height, DustID.Electric, npc.velocity.X * 0.1f, npc.velocity.Y * 0.1f);
+                }
             }
         }
         public override void ModifyHitByItem(NPC npc, Player player, Item item, ref int damage, ref float knockback, ref bool crit)
@@ -123,13 +122,12 @@ namespace LBuffMod.Common.GlobalNPCs
             for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
             {
                 int buffIndex = npc.FindBuffIndex(LBuffUtils.thermalDebuffs[i]);
-                if (buffIndex != -1)//有火系debuff则获得额外的被暴击率+增伤
+                if (buffIndex != -1)//有火系debuff则获得额外的被暴击率
                 {
-                    damage = (int)(damage * 1.05);
                     if (!crit && item.DamageType != DamageClass.Summon)
                     {
-                        int c = (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) * 0.8f);
-                        crit = Main.rand.Next(1, 100) < c ? true : false;
+                        int c = (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) * 0.6f);
+                        crit = Main.rand.Next(100) < c ? true : false;
                     }
                 }
             }
@@ -138,7 +136,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 int buffIndex = npc.FindBuffIndex(LBuffUtils.poisonousDebuffs[i]);
                 if (buffIndex != -1)
                 {
-                    if (crit && npc.buffTime[buffIndex] >= 1200)//超过20秒时暴击则按系数*时长增伤，时长减少至1/4
+                    if (crit && npc.buffTime[buffIndex] >= 1800)//超过30秒时暴击则按系数*时长增伤，时长减少至1/4
                     {
                         damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 60f, npc.buffTime[buffIndex] / 43200));
                         damage = (int)Math.Pow(damage, 7 / 5);
@@ -160,11 +158,10 @@ namespace LBuffMod.Common.GlobalNPCs
                 int buffIndex = npc.FindBuffIndex(LBuffUtils.thermalDebuffs[i]);
                 if (buffIndex != -1)
                 {
-                    damage = (int)(damage * 1.05);
                     if (!crit && !projectile.minion && projectile.DamageType != DamageClass.Summon)
                     {
-                        int c = (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) * 0.8f) - 4;//Lower add-crit chance
-                        crit = Main.rand.Next(1, 100) < c ? true : false;
+                        int c = (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) * 0.4f);//Lower add-crit chance
+                        crit = Main.rand.Next(100) < c ? true : false;
                     }
                 }
             }
@@ -173,7 +170,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 int buffIndex = npc.FindBuffIndex(LBuffUtils.poisonousDebuffs[i]);
                 if (buffIndex != -1)
                 {
-                    if (crit && npc.buffTime[buffIndex] >= 1200)//超过20秒时暴击则按系数*时长增伤，时长减少至1/4
+                    if (crit && npc.buffTime[buffIndex] >= 1800)//超过30秒时暴击则按系数*时长增伤，时长减少至1/4
                     {
                         damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 60f, npc.buffTime[buffIndex] / 43200));
                         damage = (int)Math.Pow(damage, 7 / 5);
@@ -210,6 +207,13 @@ namespace LBuffMod.Common.GlobalNPCs
             }
             int j = LBuffUtils.NPCBuffNumInBuffSet(npc, LBuffUtils.thermalDebuffs);
             npc.position -= npc.velocity * 0.05f * j;
+            /*if (npc.type == NPCID.DD2EterniaCrystal)
+            {
+                for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+                {
+                    npc.buffImmune[LBuffUtils.lDamagingDebuffs[i]] = true;
+                }
+            }*/
         }
         public override void OnHitPlayer(NPC npc, Player target, int damage, bool crit)
         {
@@ -276,6 +280,13 @@ namespace LBuffMod.Common.GlobalNPCs
             }
             #endregion
             //TODO More NPCs to inflict debuffs!!!
+        }
+        public override void OnHitByProjectile(NPC npc, Projectile projectile, int damage, float knockback, bool crit)
+        {
+            if (npc.type == NPCID.DD2EterniaCrystal)
+            {
+                Main.NewText("HP: " + npc.life + "  lifeRegen: " + npc.lifeRegen + "\ntype: " + projectile.type + " damage: " + damage + " owner: " + projectile.owner);
+            }
         }
     }
 }

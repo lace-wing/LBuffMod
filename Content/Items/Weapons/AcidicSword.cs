@@ -30,11 +30,12 @@ namespace LBuffMod.Content.Items.Weapons
         }
         public override void OnHitNPC(Player player, NPC target, int damage, float knockBack, bool crit)
         {
-            //target.AddBuff(BuffID.Electrified, 600);
-            for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
+            //target.AddBuff(BuffID.Electrified, 1800);
+            target.AddBuff(BuffID.Burning, 1800);
+            /*for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
             {
                 target.AddBuff(LBuffUtils.thermalDebuffs[i], 1200);
-            }
+            }*/
         }
         public override bool AltFunctionUse(Player player)
         {

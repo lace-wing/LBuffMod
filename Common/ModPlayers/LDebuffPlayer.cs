@@ -401,39 +401,39 @@ namespace LBuffMod.Common.ModPlayers
                 }
             }
             //皇家凝胶施加着火
-            if (royalGelOnFire)
+            if (royalGelOnFire && !target.friendly)
             {
                 target.AddBuff(BuffID.OnFire, 120);
             }
             //挥发明胶施加霜火与涂油
-            if (volatileGelatinFireNOil)
+            if (volatileGelatinFireNOil && !target.friendly)
             {
                 target.AddBuff(BuffID.Oiled, 180);
                 target.AddBuff(BuffID.Frostburn, 180);
             }
             //鲨牙项链施加流血
-            if (sharkToothNecklaceBleeding)
+            if (sharkToothNecklaceBleeding && !target.friendly)
             {
                 target.AddBuff(BuffID.Bleeding, 120);
             }
             //甜心项链施加流血和中毒
-            if (stingerNecklaceBleedingAndPoison)
+            if (stingerNecklaceBleedingAndPoison && !target.friendly)
             {
                 target.AddBuff(BuffID.Bleeding, 120);
                 target.AddBuff(BuffID.Poisoned, 60);
             }
             //发电命中敌人对自己施加带电
-            if (madnessDebuff)
+            if (madnessDebuff && !target.friendly)
             {
                 Player.AddBuff(BuffID.Electrified, 180);
             }
             //木套效果
-            if (woodArmorSet)
+            if (woodArmorSet && !target.friendly)
             {
                 target.AddBuff(BuffID.DryadsWardDebuff, 120);
             }
             //血腥套效果
-            if (crimsonSetBonus)
+            if (crimsonSetBonus && !target.friendly)
             {
                 target.AddBuff(BuffID.Bleeding, 45);
                 Player.AddBuff(BuffID.Bleeding, 10);
@@ -466,7 +466,7 @@ namespace LBuffMod.Common.ModPlayers
                 target.AddBuff(BuffID.Bleeding, 720);
             }
             //拜月邪教徒火球
-            if (proj.type == ProjectileID.CultistBossFireBall)
+            if (proj.type == ProjectileID.CultistBossFireBall && !target.friendly)
             {
                 target.AddBuff(BuffID.Burning, 45);
                 if (target.life >= target.lifeMax * 0.7f)
@@ -475,50 +475,54 @@ namespace LBuffMod.Common.ModPlayers
                 }
             }
             //挥发明胶射弹
-            if (proj.type == ProjectileID.VolatileGelatinBall)
+            if (proj.type == ProjectileID.VolatileGelatinBall && !target.friendly)
             {
                 damage *= 2;
                 target.AddBuff(BuffID.Oiled, 180);
                 proj.extraUpdates += 1;
-                if (Main.rand.NextBool(2))
+                if (Main.rand.Next(10) <= 3)
                 {
-                    proj.penetrate += 1;
+                    proj.penetrate += 3;
+                    if (Main.rand.Next(10) <= 3)
+                    {
+                        Projectile.NewProjectileDirect(proj.GetSource_FromAI(), proj.Center, target.Center - proj.Center * 0.6f, ProjectileID.VolatileGelatinBall, damage, knockback, Player.whoAmI);
+                    }
                 }
             }
             //皇家凝胶施加着火
-            if (royalGelOnFire)
+            if (royalGelOnFire && !target.friendly)
             {
                 target.AddBuff(BuffID.OnFire, 60);
             }
             //挥发明胶施加霜火与涂油
-            if (volatileGelatinFireNOil)
+            if (volatileGelatinFireNOil && !target.friendly)
             {
                 target.AddBuff(BuffID.Oiled, 90);
                 target.AddBuff(BuffID.Frostburn, 90);
             }
             //鲨牙项链施加流血
-            if (sharkToothNecklaceBleeding)
+            if (sharkToothNecklaceBleeding && !target.friendly)
             {
                 target.AddBuff(BuffID.Bleeding, 60);
             }
             //甜心项链施加流血和中毒
-            if (stingerNecklaceBleedingAndPoison)
+            if (stingerNecklaceBleedingAndPoison && !target.friendly)
             {
                 target.AddBuff(BuffID.Bleeding, 60);
                 target.AddBuff(BuffID.Poisoned, 60);
             }
             //发电命中敌人对自己施加带电
-            if (madnessDebuff)
+            if (madnessDebuff && !target.friendly)
             {
                 Player.AddBuff(BuffID.Electrified, 60);
             }
             //木套效果
-            if (woodArmorSet)
+            if (woodArmorSet && !target.friendly)
             {
                 target.AddBuff(BuffID.DryadsWardDebuff, 60);
             }
             //血腥套效果
-            if (crimsonSetBonus)
+            if (crimsonSetBonus && !target.friendly)
             {
                 if (proj.DamageType == DamageClass.Melee || proj.DamageType == DamageClass.MeleeNoSpeed || proj.DamageType == DamageClass.SummonMeleeSpeed)
                 {
