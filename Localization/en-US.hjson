@@ -6,5 +6,32 @@
 		{
 			AcidicSword : "Acidic Sword"
 		}
+		TooltipLine:
+		{
+			#饰品
+			RoyalGelFireTooltip : "Reduces damage by 20%\nYour attacks inflict OnFire!\nEnemies around you recieve more damage from normal fire debuffs"
+			SharkToothNecklaceBleedingTooltip : "Your attacks inflict Bleeding"
+			StingerNecklaceBleedingAndPoisonTooltip : "Your attacks inflict Bleeding and Poisoned"
+			#武器
+			BreakerBladeBuffsTooltip : "你被加强了，快上！"
+			BloodWeaponsTooltip : "施加流血"
+			#盔甲
+			WoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，时不时获得树妖庇护\n移动速度+20%且无摔落伤害"
+			RichMahoganyHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，经常获得树妖庇护\n获得生命力且免疫中毒"
+			BorealWoodHelmetTooltip : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，时不时获得树妖庇护\n防御+4且免疫击退和寒冷"
+			PalmWoodHelmet : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，时不时获得树妖庇护\n渔力+25，获得浮游圈效果且免疫潮湿"
+			EbonwoodHelmet : "LBuffMod额外套装奖励：\n攻击施加树妖祸害\n飞行时间小幅度增加且免疫着火了！和诅咒焰"
+			ShadewoodHelmet : "LBuffMod额外套装奖励：\n攻击施加树妖祸害\n伤害+15%且免疫着火了！\n但生命回复略微减少"
+			PearlwoodHelmet : "LBuffMod额外套装奖励：\n攻击施加树妖祸害，持续获得树妖庇护\n魔力上限+30，防御+8，飞行时间中等幅度增加且免疫霜火"
+			SpookyHelmet : "LBuffMod额外套装奖励：\n攻击施加树妖祸害\n鞭长+15%且免疫暗影焰"
+		}
+		BuffName:
+		{
+			Madness : "发电"
+		}
+		BuffDescription: 
+		{
+			Madness : "来自零群理发店的神秘力量"
+		}
 	}
 }

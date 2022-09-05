@@ -18,7 +18,11 @@ namespace LBuffMod.Common.GlobalBuffs
                     //若不足12分钟则叠加持续时间
                     if (npc.buffTime[buffIndex] < 43200)
                     {
-                        npc.buffTime[buffIndex] += time;
+                        if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Burning)
+                        {
+                            npc.buffTime[buffIndex] += (int)(time * 0.2f);
+                        }
+                        else npc.buffTime[buffIndex] += time;
                         return true;
                     }
                 }
@@ -27,19 +31,42 @@ namespace LBuffMod.Common.GlobalBuffs
         }
         public override bool ReApply(int type, Player player, int time, int buffIndex)
         {
-            for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+            if (!player.dead)
             {
-                if (type == LBuffUtils.lDamagingDebuffs[i])
+                for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
                 {
-                    //若不足12分钟则叠加持续时间
-                    if (player.buffTime[buffIndex] < 43200)
+                    if (type == LBuffUtils.lDamagingDebuffs[i])
                     {
-                        player.buffTime[buffIndex] += time;
-                        return true;
+                        //若不足12分钟则叠加持续时间
+                        if (player.buffTime[buffIndex] < 43200)
+                        {
+                            if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Burning)
+                            {
+                                player.buffTime[buffIndex] += (int)(time * 0.2f);
+                            }
+                            else player.buffTime[buffIndex] += time;
+                            return true;
+                        }
                     }
                 }
             }
             return base.ReApply(type, player, time, buffIndex);
+        }
+        public override void Update(int type, NPC npc, ref int buffIndex)
+        {
+            //带电、灼烧更快流失
+            if (type == BuffID.Electrified || type == BuffID.Burning)
+            {
+                npc.buffTime[buffIndex] -= 1;
+            }
+        }
+        public override void Update(int type, Player player, ref int buffIndex)
+        {
+            //带电、灼烧更快流失
+            if (type == BuffID.Electrified || type == BuffID.Burning)
+            {
+                player.buffTime[buffIndex] -= 1;
+            }
         }
     }
 }

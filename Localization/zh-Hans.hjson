@@ -6,5 +6,121 @@
 		{
 			AcidicSword : "酸性的剑"
 		}
+		TooltipLine:
+		{
+			#饰品
+			RoyalGelFireTooltip : 
+				'''
+				降低20%伤害
+				你的攻击施加着火了！
+				附近的敌人受到的来自常规火焰的伤害增加
+				'''
+			VolatileGelatinFireNOil : 
+				'''
+				降低20%伤害
+				你的攻击施加霜火与涂油
+				明胶球的伤害提升，命中时加速有且概率分裂
+				附近的敌人受到的来自火焰的伤害增加
+				'''
+			SharkToothNecklaceBleedingTooltip : 
+				'''
+				基础伤害-1
+				你的攻击施加流血
+				'''
+			StingerNecklaceBleedingAndPoisonTooltip : 
+				'''
+				基础伤害-1
+				你的攻击施加流血和中毒
+				'''
+			#武器
+			BreakerBladeBuffsTooltip : 
+				'''
+				LBuffMod：基础大小和造成的伤害提升
+				对90%血量及以上的敌人造成更高伤害并附加灼烧与流血
+				命中敌人使毁灭刃变大，伤害降低并召唤火球
+				火球对80%血量及以上的敌人造成更高伤害并短暂施加灼烧
+				'''
+			BloodWeaponsTooltip : "施加流血"
+			#盔甲
+			WoodHelmetTooltip : 
+				'''
+				LBuffMod额外套装奖励：
+				攻击施加树妖祸害，时不时获得树妖庇护
+				受击时获得树妖庇护
+				移动速度+25%
+				免疫摔落伤害
+				身处森林时移动速度+15%
+				'''
+			RichMahoganyHelmetTooltip : 
+				'''
+				LBuffMod额外套装奖励：
+				攻击施加树妖祸害，经常获得树妖庇护
+				受击时获得树妖庇护
+				生命上限+40
+				免疫中毒
+				身处丛林时攻击速度+10%，跳跃速度+20%
+				'''
+			BorealWoodHelmetTooltip : 
+				'''
+				LBuffMod额外套装奖励：
+				攻击施加树妖祸害，时不时获得树妖庇护
+				防御+4
+				免疫击退和寒冷
+				身处雪原时移动速度+25%
+				'''
+			PalmWoodHelmetTooltip : 
+				'''
+				LBuffMod额外套装奖励：
+				攻击施加树妖祸害，时不时获得树妖庇护
+				渔力+33，获得浮游圈效果
+				免疫潮湿
+				身处海洋或沙漠时能进行海啸跳跃
+				'''
+			EbonwoodHelmetTooltip : 
+				'''
+				LBuffMod额外套装奖励：
+				攻击施加树妖祸害
+				允许飞行，时间小幅度增加
+				受击时释放数个火焰花球
+				免疫着火了！和诅咒焰
+				身处腐化时防御+2
+				'''
+			ShadewoodHelmetTooltip : 
+				'''
+				LBuffMod额外套装奖励：
+				攻击施加树妖祸害
+				伤害+10%但生命回复略微减少
+				以近战武器或鞭命中目标时对自身和目标施加流血
+				流血时近战与鞭攻速+15%
+				自身与目标皆流血时可吸血
+				免疫着火了！
+				身处血腥时伤害+15%且不断获得流血
+				'''
+			PearlwoodHelmetTooltip : 
+				'''
+				LBuffMod额外套装奖励：
+				攻击施加树妖祸害，持续获得树妖庇护
+				伤害+25%，攻击速度+15%，魔力上限+60
+				防御+8，移动速度+25%，召唤栏+2
+				允许飞行，飞行时间中等幅度增加
+				免疫霜火
+				身处神圣时获得24%伤害减免
+				'''
+			SpookyHelmetTooltip : 
+				'''
+				LBuffMod额外套装奖励：
+				攻击施加树妖祸害
+				鞭长+15%
+				免疫暗影焰
+				'''
+		}
+		BuffName:
+		{
+			Madness : "发电"
+		}
+		BuffDescription: 
+		{
+			Madness : "来自零群理发店的神秘力量"
+		}
 	}
 }
