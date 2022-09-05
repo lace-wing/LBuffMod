@@ -44,6 +44,10 @@ namespace LBuffMod.Common.GlobalBuffs
                             {
                                 player.buffTime[buffIndex] += (int)(time * 0.2f);
                             }
+                            else if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Bleeding && player.buffTime[buffIndex] >= 900)
+                            {
+                                player.buffTime[buffIndex] += (int)(time * 0.01f);
+                            }
                             else player.buffTime[buffIndex] += time;
                             return true;
                         }

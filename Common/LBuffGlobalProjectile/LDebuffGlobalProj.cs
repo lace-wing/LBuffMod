@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -70,6 +71,26 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
             }
             #endregion
             //TODO More projs to inflict debuffs!!!
+        }
+        public override void PostAI(Projectile projectile)
+        {
+            if (projectile.type == ProjectileID.VolatileGelatinBall && projectile.friendly)
+            {
+                if (projectile.scale > 1.5f)
+                {
+                    projectile.scale -= 0.003f;
+                }
+                projectile.position.X += projectile.velocity.X * 0.4f;
+                projectile.position.Y -= projectile.velocity.Y * 0.1f;
+                NPC targetNPC = projectile.FindTargetWithinRange(480);
+                if (targetNPC != null)
+                {
+                    int hX = (int)(targetNPC.Center.X - projectile.Center.X);
+                    int hY = (int)(targetNPC.Center.Y - projectile.Center.Y);
+                    Vector2 homingVelocity = new Vector2(hX * Main.rand.Next(2, 4), hY * Main.rand.Next(2, 6)) * 0.0006f;
+                    projectile.velocity += homingVelocity;
+                }
+            }
         }
     }
 }

@@ -12,10 +12,10 @@ namespace LBuffMod.Common.ModPlayers
     public class LDebuffPlayer : ModPlayer
     {
         public bool royalGelOnFire;
-        public int royalGelFireDamage = -6;
+        public int royalGelFireDamage = -12;
         public float royalGelFireDamageMultiplier = 0.5f;
         public bool volatileGelatinFireNOil;
-        public int volatileGelatinFireDamage = -12;
+        public int volatileGelatinFireDamage = -24;
         public float volatileGelatinFireDamageMultiplier = 1f;
         public bool sharkToothNecklaceBleeding;
         public bool stingerNecklaceBleedingAndPoison;
@@ -232,7 +232,7 @@ namespace LBuffMod.Common.ModPlayers
             //流血真的流血了
             if (Player.HasBuff(BuffID.Bleeding))
             {
-                Player.lifeRegen -= 6;
+                Player.lifeRegen -= LBuffUtils.BuffIDToLifeRegen(BuffID.Bleeding);
                 if (Player.lifeRegen > 0)
                 {
                     Player.lifeRegen = 0;
@@ -417,7 +417,7 @@ namespace LBuffMod.Common.ModPlayers
             //挥发明胶施加霜火与涂油
             if (volatileGelatinFireNOil && !target.friendly)
             {
-                target.AddBuff(BuffID.Oiled, 180);
+                //target.AddBuff(BuffID.Oiled, 180);
                 target.AddBuff(BuffID.Frostburn, 180);
             }
             //鲨牙项链施加流血
@@ -486,17 +486,29 @@ namespace LBuffMod.Common.ModPlayers
             //挥发明胶射弹
             if (proj.type == ProjectileID.VolatileGelatinBall && !target.friendly)
             {
-                damage *= 2;
-                target.AddBuff(BuffID.Oiled, 180);
-                proj.damage = (int)(proj.damage * 0.6f);
-                proj.extraUpdates += 1;
-                if (Main.rand.Next(10) <= 3)
+                damage = (int)(damage * proj.scale * 1.2f);
+                proj.velocity *= 0.3f;
+                target.AddBuff(BuffID.Frostburn, (int)(120 * proj.scale));
+                if (proj.scale < 6)
+                {
+                    proj.scale += 0.5f;
+                }
+                //proj.extraUpdates += 1;
+                if (Main.rand.NextBool(5))
                 {
                     proj.penetrate += 3;
-                    if (Main.rand.Next(10) <= 3 && Main.myPlayer == Player.whoAmI && Main.myPlayer == proj.owner)
+                }
+                if (Main.rand.NextBool(10 - (int)proj.scale) && proj.scale >= 3f && Main.myPlayer == Player.whoAmI && Main.myPlayer == proj.owner)
+                {
+                    NPC targetNPC = proj.FindTargetWithinRange(320);
+                    for (int i = 0; i < 2; i++)
                     {
-                        Projectile.NewProjectileDirect(proj.GetSource_FromAI(), proj.Center, target.Center - proj.Center * 0.6f, ProjectileID.VolatileGelatinBall, damage, knockback, Player.whoAmI);
+                        Vector2 velocity = (targetNPC.Center - proj.Center) * 0.3f * (i + 1);
+                        Projectile extraVGProj = Projectile.NewProjectileDirect(proj.GetSource_FromAI(), proj.Center, velocity, ProjectileID.VolatileGelatinBall, (int)(damage * 0.4f), knockback, Player.whoAmI);
+                        extraVGProj.penetrate -= 2;
+                        extraVGProj.scale = proj.scale * 0.6f;
                     }
+                    proj.Kill();
                 }
             }
             //皇家凝胶施加着火
@@ -507,7 +519,7 @@ namespace LBuffMod.Common.ModPlayers
             //挥发明胶施加霜火与涂油
             if (volatileGelatinFireNOil && !target.friendly)
             {
-                target.AddBuff(BuffID.Oiled, 90);
+                //target.AddBuff(BuffID.Oiled, 90);
                 target.AddBuff(BuffID.Frostburn, 90);
             }
             //鲨牙项链施加流血

@@ -21,14 +21,18 @@ namespace LBuffMod.Common.GlobalNPCs
         public override void ResetEffects(NPC npc)
         {
             royalGelNearby = false;
+            totalRoyalGelFireDamage = 0;
+            totalRoyalGelFireDamageMultiplier = 1;
             volatilegeltinNearby = false;
+            totalVolatileGelatinFireDamage = 0;
+            totalVolatileGelatinFireDamageMultiplier = 1;
         }
         public override void UpdateLifeRegen(NPC npc, ref int damage)
         {
             //检测皇家凝胶常规火焰增伤
             for (int i = 0; i < Main.player.Length; i++)
             {
-                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelOnFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
+                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelOnFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 810)
                 {
                     royalGelNearby = true;
                     totalRoyalGelFireDamage += Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelFireDamage;
@@ -38,7 +42,7 @@ namespace LBuffMod.Common.GlobalNPCs
             //检测挥发明胶火焰增伤
             for (int i = 0; i < Main.player.Length; i++)
             {
-                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFireNOil && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
+                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFireNOil && Vector2.Distance(npc.Center, Main.player[i].Center) < 810)
                 {
                     volatilegeltinNearby = true;
                     totalVolatileGelatinFireDamage += Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFireDamage;
@@ -71,10 +75,6 @@ namespace LBuffMod.Common.GlobalNPCs
                     npc.lifeRegen += additionalDamage;
                     damage -= additionalDamage / 2;
                     //Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage + " lifeRegen: " + npc.lifeRegen + " totalRGD: " + totalVolatileGelatinFireDamage);
-                    totalRoyalGelFireDamage = 0;
-                    totalRoyalGelFireDamageMultiplier = 1;
-                    totalVolatileGelatinFireDamage = 0;
-                    totalVolatileGelatinFireDamageMultiplier = 1;
                 }
             }
             //流血真的流血了
@@ -285,7 +285,7 @@ namespace LBuffMod.Common.GlobalNPCs
         {
             if (npc.type == NPCID.DD2EterniaCrystal)
             {
-                Main.NewText("HP: " + npc.life + "  lifeRegen: " + npc.lifeRegen + "\ntype: " + projectile.type + " damage: " + damage + " owner: " + projectile.owner);
+                //Main.NewText("HP: " + npc.life + "  lifeRegen: " + npc.lifeRegen + "\ntype: " + projectile.type + " damage: " + damage + " owner: " + projectile.owner);
             }
         }
     }
