@@ -71,12 +71,5 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
             #endregion
             //TODO More projs to inflict debuffs!!!
         }
-        public override void OnHitNPC(Projectile projectile, NPC target, int damage, float knockback, bool crit)
-        {
-            if (projectile.type == ProjectileID.DD2JavelinHostileT3)
-            {
-                Main.NewText("damage: " + damage + "  crit: " + crit);
-            }
-        }
     }
 }

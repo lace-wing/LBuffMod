@@ -11,20 +11,20 @@ namespace LBuffMod.Common.ModPlayers
 {
     public class LDebuffPlayer : ModPlayer
     {
-        public bool royalGelOnFire = false;
+        public bool royalGelOnFire;
         public int royalGelFireDamage = -6;
-        public float royalGelFireDamageMultiplier = 0.2f;
-        public bool volatileGelatinFireNOil = false;
+        public float royalGelFireDamageMultiplier = 0.5f;
+        public bool volatileGelatinFireNOil;
         public int volatileGelatinFireDamage = -12;
-        public float volatileGelatinFireDamageMultiplier = 0.5f;
-        public bool sharkToothNecklaceBleeding = false;
-        public bool stingerNecklaceBleedingAndPoison = false;
-        public bool madnessDebuff = false;
-        public bool hairdressersWhiteSilkStockings = false;
-        public bool woodArmorSet = false;
-        public bool corruptionSetBonus = false;
-        public bool crimsonSetBonus = false;
-        public bool dryadsWardOnHit = false;
+        public float volatileGelatinFireDamageMultiplier = 1f;
+        public bool sharkToothNecklaceBleeding;
+        public bool stingerNecklaceBleedingAndPoison;
+        public bool madnessDebuff;
+        public bool hairdressersWhiteSilkStockings;
+        public bool woodArmorSet;
+        public bool corruptionSetBonus;
+        public bool crimsonSetBonus;
+        public bool dryadsWardOnHit;
         public override void ResetEffects()
         {
             royalGelOnFire = false;
@@ -304,7 +304,10 @@ namespace LBuffMod.Common.ModPlayers
             {
                 for (int i = 1; i < 3; i++)
                 {
-                    Projectile cursedProj = Projectile.NewProjectileDirect(Player.GetSource_OnHurt(npc), Player.Center, (npc.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (int)(damage * 0.4f), 4f, Player.whoAmI);
+                    if (Main.myPlayer == Player.whoAmI)
+                    {
+                        Projectile.NewProjectileDirect(Player.GetSource_OnHurt(npc), Player.Center, (npc.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (int)(damage * 0.6f), 4f, Player.whoAmI);
+                    }
                 }
                 npc.AddBuff(BuffID.CursedInferno, 30);
             }
@@ -358,7 +361,10 @@ namespace LBuffMod.Common.ModPlayers
             {
                 for (int i = 1; i < 3; i++)
                 {
-                    Projectile cursedProj = Projectile.NewProjectileDirect(Player.GetSource_OnHurt(proj), Player.Center, (proj.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (int)(damage * 0.4f), 4f, Player.whoAmI);
+                    if (Main.myPlayer == Player.whoAmI)
+                    {
+                        Projectile.NewProjectileDirect(Player.GetSource_OnHurt(proj), Player.Center, (proj.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (int)(damage * 0.4f), 4f, Player.whoAmI);
+                    }
                 }
             }
             //受击时获得树妖庇护
@@ -393,11 +399,14 @@ namespace LBuffMod.Common.ModPlayers
                     bool opp = Main.rand.NextBool();
                     int sW = Main.screenWidth;
                     int sH = Main.screenHeight;
-                    Vector2 position = target.Center + new Vector2((opp ? sW * 0.5f : -sW * 0.5f) + (opp ? Main.rand.Next(-sW, 0) : Main.rand.Next(0, sW)), (opp ? sH * 0.5f : -sH * 0.5f) + (opp ? Main.rand.Next(-sH, 0) : Main.rand.Next(0, sH)));
-                    Projectile breakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize((Player.Center + target.Center) / 2 - position) * 9, ProjectileID.CultistBossFireBall, (int)(damage * 0.8f), item.knockBack * 0.8f, Player.whoAmI);
-                    breakerBladeFireBall.friendly = true;
-                    breakerBladeFireBall.hostile = false;
-                    breakerBladeFireBall.tileCollide = false;
+                    if (Main.myPlayer == Player.whoAmI)
+                    {
+                        Vector2 position = target.Center + new Vector2((opp ? sW * 0.5f : -sW * 0.5f) + (opp ? Main.rand.Next(-sW, 0) : Main.rand.Next(0, sW)), (opp ? sH * 0.5f : -sH * 0.5f) + (opp ? Main.rand.Next(-sH, 0) : Main.rand.Next(0, sH)));
+                        Projectile breakerBladeFireBall = Projectile.NewProjectileDirect(Player.GetSource_OnHit(item), position, Vector2.Normalize((Player.Center + target.Center) / 2 - position) * 9, ProjectileID.CultistBossFireBall, (int)(damage * 0.8f), item.knockBack * 0.8f, Player.whoAmI);
+                        breakerBladeFireBall.friendly = true;
+                        breakerBladeFireBall.hostile = false;
+                        breakerBladeFireBall.tileCollide = false;
+                    }
                 }
             }
             //皇家凝胶施加着火
@@ -479,11 +488,12 @@ namespace LBuffMod.Common.ModPlayers
             {
                 damage *= 2;
                 target.AddBuff(BuffID.Oiled, 180);
+                proj.damage = (int)(proj.damage * 0.6f);
                 proj.extraUpdates += 1;
                 if (Main.rand.Next(10) <= 3)
                 {
                     proj.penetrate += 3;
-                    if (Main.rand.Next(10) <= 3)
+                    if (Main.rand.Next(10) <= 3 && Main.myPlayer == Player.whoAmI && Main.myPlayer == proj.owner)
                     {
                         Projectile.NewProjectileDirect(proj.GetSource_FromAI(), proj.Center, target.Center - proj.Center * 0.6f, ProjectileID.VolatileGelatinBall, damage, knockback, Player.whoAmI);
                     }

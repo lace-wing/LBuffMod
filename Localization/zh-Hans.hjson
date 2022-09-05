@@ -19,10 +19,19 @@
 				'''
 				降低20%伤害
 				你的攻击施加霜火与涂油
-				明胶球的伤害提升
+				明胶球的伤害提升，命中时加速有且概率分裂
+				附近的敌人受到的来自火焰的伤害增加
 				'''
-			SharkToothNecklaceBleedingTooltip : "你的攻击施加流血"
-			StingerNecklaceBleedingAndPoisonTooltip : "你的攻击施加流血和中毒"
+			SharkToothNecklaceBleedingTooltip : 
+				'''
+				基础伤害-1
+				你的攻击施加流血
+				'''
+			StingerNecklaceBleedingAndPoisonTooltip : 
+				'''
+				基础伤害-1
+				你的攻击施加流血和中毒
+				'''
 			#武器
 			BreakerBladeBuffsTooltip : 
 				'''

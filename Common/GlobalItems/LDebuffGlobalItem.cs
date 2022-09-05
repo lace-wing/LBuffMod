@@ -20,10 +20,12 @@ namespace LBuffMod.Common.GlobalItems
             if (item.type == ItemID.SharkToothNecklace)
             {
                 player.GetModPlayer<LDebuffPlayer>().sharkToothNecklaceBleeding = true;
+                player.GetDamage(DamageClass.Generic).Base -= 1;
             }
             if (item.type == ItemID.SweetheartNecklace)
             {
                 player.GetModPlayer<LDebuffPlayer>().stingerNecklaceBleedingAndPoison = true;
+                player.GetDamage(DamageClass.Generic).Base -= 1;
             }
             if (item.type == ItemID.VolatileGelatin)
             {
