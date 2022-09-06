@@ -11,9 +11,10 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
     public class LDebuffGlobalProj : GlobalProjectile
     {
         public override bool InstancePerEntity => true;
+        public bool sourceIsNotNull;
         public NPC npc;
         public Player player;
-        public Item item;
+        public Item sourceItem;
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
             if (source is EntitySource_Parent)
@@ -22,14 +23,16 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
                 if (source_Parent.Entity is NPC)
                 {
                     npc = (NPC)source_Parent.Entity;
+                    sourceIsNotNull = true;
                 }
-                if (source_Parent.Entity is Player)
+            }
+            if (source is EntitySource_ItemUse)
+            {
+                EntitySource_ItemUse source_ItemUse = source as EntitySource_ItemUse;
+                if (source_ItemUse.Item is Item)
                 {
-                    player = (Player)source_Parent.Entity;
-                }
-                if (source_Parent.Entity is Item)
-                {
-                    item = (Item)source_Parent.Entity;
+                    sourceItem = (Item)source_ItemUse.Item;
+                    sourceIsNotNull = true;
                 }
             }
         }
@@ -74,7 +77,7 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
         }
         public override void PostAI(Projectile projectile)
         {
-            if (projectile.type == ProjectileID.VolatileGelatinBall && projectile.friendly)
+            if (projectile.type == ProjectileID.VolatileGelatinBall && projectile.friendly && (sourceIsNotNull ? sourceItem.type == ItemID.VolatileGelatin : false))//挥发明胶射弹修改
             {
                 if (projectile.scale > 1.5f)
                 {
@@ -87,8 +90,12 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
                 {
                     int hX = (int)(targetNPC.Center.X - projectile.Center.X);
                     int hY = (int)(targetNPC.Center.Y - projectile.Center.Y);
-                    Vector2 homingVelocity = new Vector2(hX * Main.rand.Next(2, 4), hY * Main.rand.Next(2, 6)) * 0.0006f;
+                    Vector2 homingVelocity = new Vector2(hX * Main.rand.Next(1, 3), hY * Main.rand.Next(2, 6)) * 0.0006f;
                     projectile.velocity += homingVelocity;
+                    if (targetNPC.Center.Y < projectile.Center.Y)
+                    {
+                        projectile.velocity.Y += hY * 0.0018f;
+                    }
                 }
             }
         }

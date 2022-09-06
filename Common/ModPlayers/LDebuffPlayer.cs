@@ -12,11 +12,11 @@ namespace LBuffMod.Common.ModPlayers
     public class LDebuffPlayer : ModPlayer
     {
         public bool royalGelOnFire;
-        public int royalGelFireDamage = -12;
-        public float royalGelFireDamageMultiplier = 0.5f;
-        public bool volatileGelatinFireNOil;
-        public int volatileGelatinFireDamage = -24;
-        public float volatileGelatinFireDamageMultiplier = 1f;
+        public int royalGelFireDamage = -6;
+        public float royalGelFireDamageMultiplier = 0.9f;
+        public bool volatileGelatinFire;
+        public int volatileGelatinFireDamage = -18;
+        public float volatileGelatinFireDamageMultiplier = 1.8f;
         public bool sharkToothNecklaceBleeding;
         public bool stingerNecklaceBleedingAndPoison;
         public bool madnessDebuff;
@@ -28,7 +28,7 @@ namespace LBuffMod.Common.ModPlayers
         public override void ResetEffects()
         {
             royalGelOnFire = false;
-            volatileGelatinFireNOil = false;
+            volatileGelatinFire = false;
             sharkToothNecklaceBleeding = false;
             stingerNecklaceBleedingAndPoison = false;
             madnessDebuff = false;
@@ -415,7 +415,7 @@ namespace LBuffMod.Common.ModPlayers
                 target.AddBuff(BuffID.OnFire, 120);
             }
             //挥发明胶施加霜火与涂油
-            if (volatileGelatinFireNOil && !target.friendly)
+            if (volatileGelatinFire && !target.friendly)
             {
                 //target.AddBuff(BuffID.Oiled, 180);
                 target.AddBuff(BuffID.Frostburn, 180);
@@ -486,27 +486,27 @@ namespace LBuffMod.Common.ModPlayers
             //挥发明胶射弹
             if (proj.type == ProjectileID.VolatileGelatinBall && !target.friendly)
             {
-                damage = (int)(damage * proj.scale * 1.2f);
-                proj.velocity *= 0.3f;
+                damage += Math.Min(damage * 6, (int)(proj.damage * proj.scale * 0.3f));
+                proj.velocity *= 0.6f;
                 target.AddBuff(BuffID.Frostburn, (int)(120 * proj.scale));
                 if (proj.scale < 6)
                 {
                     proj.scale += 0.5f;
                 }
                 //proj.extraUpdates += 1;
-                if (Main.rand.NextBool(5))
+                if (Main.rand.Next(7) >= 1)
                 {
                     proj.penetrate += 3;
                 }
-                if (Main.rand.NextBool(10 - (int)proj.scale) && proj.scale >= 3f && Main.myPlayer == Player.whoAmI && Main.myPlayer == proj.owner)
+                if (Main.rand.NextBool(12 - (int)proj.scale) && proj.scale >= 3f && Main.myPlayer == Player.whoAmI && Main.myPlayer == proj.owner)
                 {
                     NPC targetNPC = proj.FindTargetWithinRange(320);
                     for (int i = 0; i < 2; i++)
                     {
-                        Vector2 velocity = (targetNPC.Center - proj.Center) * 0.3f * (i + 1);
-                        Projectile extraVGProj = Projectile.NewProjectileDirect(proj.GetSource_FromAI(), proj.Center, velocity, ProjectileID.VolatileGelatinBall, (int)(damage * 0.4f), knockback, Player.whoAmI);
-                        extraVGProj.penetrate -= 2;
-                        extraVGProj.scale = proj.scale * 0.6f;
+                        Vector2 velocity = (targetNPC.Center - proj.Center) * 0.12f * (i + 1);
+                        Projectile extraVGProj = Projectile.NewProjectileDirect(proj.GetSource_FromThis(), proj.Center, velocity, ProjectileID.VolatileGelatinBall, (int)(damage * 0.6f), knockback, Player.whoAmI);
+                        extraVGProj.penetrate /= 2;
+                        extraVGProj.scale = proj.scale * 0.5f;
                     }
                     proj.Kill();
                 }
@@ -517,7 +517,7 @@ namespace LBuffMod.Common.ModPlayers
                 target.AddBuff(BuffID.OnFire, 60);
             }
             //挥发明胶施加霜火与涂油
-            if (volatileGelatinFireNOil && !target.friendly)
+            if (volatileGelatinFire && !target.friendly)
             {
                 //target.AddBuff(BuffID.Oiled, 90);
                 target.AddBuff(BuffID.Frostburn, 90);

@@ -42,7 +42,7 @@ namespace LBuffMod.Common.GlobalNPCs
             //检测挥发明胶火焰增伤
             for (int i = 0; i < Main.player.Length; i++)
             {
-                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFireNOil && Vector2.Distance(npc.Center, Main.player[i].Center) < 810)
+                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 810)
                 {
                     volatilegeltinNearby = true;
                     totalVolatileGelatinFireDamage += Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFireDamage;
@@ -66,7 +66,7 @@ namespace LBuffMod.Common.GlobalNPCs
                     }
                     if (LBuffUtils.NPCHasTheBuffInBuffSet(npc, LBuffUtils.lDamagingDebuffs[i], LBuffUtils.thermalDebuffs))//是火
                     {
-                        if (royalGelNearby)//挥发明胶火焰增伤
+                        if (volatilegeltinNearby)//挥发明胶火焰增伤
                         {
                             additionalDamage += (int)(totalVolatileGelatinFireDamage * MathHelper.Lerp(1f, 6f, npc.buffTime[buffIndex] / 43200f));
                             additionalDamage = (int)(additionalDamage * totalVolatileGelatinFireDamageMultiplier);
@@ -206,7 +206,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 }
             }
             int j = LBuffUtils.NPCBuffNumInBuffSet(npc, LBuffUtils.thermalDebuffs);
-            npc.position -= npc.velocity * 0.05f * j;
+            npc.position -= npc.velocity * 0.05f * j;//火焰减速
             /*if (npc.type == NPCID.DD2EterniaCrystal)
             {
                 for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)

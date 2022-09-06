@@ -30,7 +30,7 @@ namespace LBuffMod.Common.GlobalItems
             if (item.type == ItemID.VolatileGelatin)
             {
                 player.GetDamage(DamageClass.Generic) -= 0.2f;
-                player.GetModPlayer<LDebuffPlayer>().volatileGelatinFireNOil = true;
+                player.GetModPlayer<LDebuffPlayer>().volatileGelatinFire = true;
             }
         }
         public override void UpdateInventory(Item item, Player player)
