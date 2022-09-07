@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LBuffMod.Common.Utilities;
+using static LBuffMod.Common.Utilities.LBuffUtils;
 
 namespace LBuffMod.Common.GlobalBuffs
 {
@@ -11,14 +11,14 @@ namespace LBuffMod.Common.GlobalBuffs
     {
         public override bool ReApply(int type, NPC npc, int time, int buffIndex)
         {
-            for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+            for (int i = 0; i < lDamagingDebuffs.Length; i++)
             {
-                if (type == LBuffUtils.lDamagingDebuffs[i])
+                if (type == lDamagingDebuffs[i])
                 {
                     //若不足12分钟则叠加持续时间
                     if (npc.buffTime[buffIndex] < 43200)
                     {
-                        if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Burning)
+                        if (lDamagingDebuffs[i] == BuffID.Burning)
                         {
                             npc.buffTime[buffIndex] += (int)(time * 0.2f);
                         }
@@ -33,20 +33,16 @@ namespace LBuffMod.Common.GlobalBuffs
         {
             if (!player.dead)
             {
-                for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+                for (int i = 0; i < lDamagingDebuffs.Length; i++)
                 {
-                    if (type == LBuffUtils.lDamagingDebuffs[i])
+                    if (type == lDamagingDebuffs[i])
                     {
                         //若不足12分钟则叠加持续时间
                         if (player.buffTime[buffIndex] < 43200)
                         {
-                            if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Burning)
+                            if (lDamagingDebuffs[i] == BuffID.Burning)
                             {
                                 player.buffTime[buffIndex] += (int)(time * 0.2f);
-                            }
-                            else if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Bleeding && player.buffTime[buffIndex] >= 900)
-                            {
-                                player.buffTime[buffIndex] += (int)(time * 0.01f);
                             }
                             else player.buffTime[buffIndex] += time;
                             return true;

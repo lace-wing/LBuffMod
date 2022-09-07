@@ -151,7 +151,7 @@ namespace LBuffMod.Common.Utilities
                 case BuffID.Suffocation:
                     return -40;
                 case BuffID.Bleeding:
-                    return -4;//Does not give negative lifeRegen in vanilla code
+                    return -6;//Does not give negative lifeRegen in vanilla code
                 case BuffID.TheTongue:
                     return -100;
             }

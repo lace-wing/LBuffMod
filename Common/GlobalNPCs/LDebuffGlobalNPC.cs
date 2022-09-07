@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using LBuffMod.Common.ModPlayers;
+using static LBuffMod.Common.Utilities.LBuffUtils;
+using static LBuffMod.Common.Utilities.LCollisionUtils;
 
 namespace LBuffMod.Common.GlobalNPCs
 {
@@ -15,9 +17,12 @@ namespace LBuffMod.Common.GlobalNPCs
         public bool royalGelNearby = false;
         public int totalRoyalGelFireDamage = 0;
         public float totalRoyalGelFireDamageMultiplier = 1;
+
         public bool volatilegeltinNearby = false;
         public int totalVolatileGelatinFireDamage = 1;
         public float totalVolatileGelatinFireDamageMultiplier = 0;
+
+        public int npcOnSpikesTimer = 0;
         public override void ResetEffects(NPC npc)
         {
             royalGelNearby = false;
@@ -32,7 +37,7 @@ namespace LBuffMod.Common.GlobalNPCs
             //检测皇家凝胶常规火焰增伤
             for (int i = 0; i < Main.player.Length; i++)
             {
-                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelOnFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 810)
+                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelOnFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
                 {
                     royalGelNearby = true;
                     totalRoyalGelFireDamage += Main.player[i].GetModPlayer<LDebuffPlayer>().royalGelFireDamage;
@@ -42,7 +47,7 @@ namespace LBuffMod.Common.GlobalNPCs
             //检测挥发明胶火焰增伤
             for (int i = 0; i < Main.player.Length; i++)
             {
-                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 810)
+                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFire && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
                 {
                     volatilegeltinNearby = true;
                     totalVolatileGelatinFireDamage += Main.player[i].GetModPlayer<LDebuffPlayer>().volatileGelatinFireDamage;
@@ -50,25 +55,26 @@ namespace LBuffMod.Common.GlobalNPCs
                 }
             }
             //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
-            for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+            for (int i = 0; i < lDamagingDebuffs.Length; i++)
             {
-                int buffIndex = npc.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
+                int buffIndex = npc.FindBuffIndex(lDamagingDebuffs[i]);
                 if (buffIndex != -1)//TODO Balanced formula needed
                 {
-                    int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.3f, 3f, npc.buffTime[buffIndex] / 43200f));
-                    if (LBuffUtils.NPCHasTheBuffInBuffSet(npc, LBuffUtils.lDamagingDebuffs[i], LBuffUtils.normalFireDebuffs))//是常规火焰
+                    int additionalDamage = (int)(BuffIDToLifeRegen(lDamagingDebuffs[i]) * MathHelper.Lerp(-0.3f, 2.1f, npc.buffTime[buffIndex] / 43200f));
+
+                    if (NPCHasTheBuffInBuffSet(npc, lDamagingDebuffs[i], normalFireDebuffs))//是常规火焰
                     {
                         if (royalGelNearby)//皇家凝胶常规火焰增伤
                         {
-                            additionalDamage += (int)(totalRoyalGelFireDamage * MathHelper.Lerp(1f, 6f, npc.buffTime[buffIndex] / 43200f));
+                            additionalDamage += (int)(totalRoyalGelFireDamage * MathHelper.Lerp(0.3f, 3f, npc.buffTime[buffIndex] / 43200f));
                             additionalDamage = (int)(additionalDamage * totalRoyalGelFireDamageMultiplier);
                         }
                     }
-                    if (LBuffUtils.NPCHasTheBuffInBuffSet(npc, LBuffUtils.lDamagingDebuffs[i], LBuffUtils.thermalDebuffs))//是火
+                    if (NPCHasTheBuffInBuffSet(npc, lDamagingDebuffs[i], normalFireDebuffs) || NPCHasTheBuffInBuffSet(npc, lDamagingDebuffs[i], frostFireDebuffs))//是常规火、霜火
                     {
                         if (volatilegeltinNearby)//挥发明胶火焰增伤
                         {
-                            additionalDamage += (int)(totalVolatileGelatinFireDamage * MathHelper.Lerp(1f, 6f, npc.buffTime[buffIndex] / 43200f));
+                            additionalDamage += (int)(totalVolatileGelatinFireDamage * MathHelper.Lerp(0.3f, 3f, npc.buffTime[buffIndex] / 43200f));
                             additionalDamage = (int)(additionalDamage * totalVolatileGelatinFireDamageMultiplier);
                         }
                     }
@@ -80,14 +86,14 @@ namespace LBuffMod.Common.GlobalNPCs
             //流血真的流血了
             if (npc.HasBuff(BuffID.Bleeding))
             {
-                npc.lifeRegen += LBuffUtils.BuffIDToLifeRegen(BuffID.Bleeding);
+                npc.lifeRegen += BuffIDToLifeRegen(BuffID.Bleeding);
                 if (npc.lifeRegen > 0)
                 {
                     npc.lifeRegen = 0;
                 }
                 if (npc.lifeRegen < 0)
                 {
-                    damage -= LBuffUtils.BuffIDToLifeRegen(BuffID.Bleeding);
+                    damage -= BuffIDToLifeRegen(BuffID.Bleeding);
                 }
             }
             //灼烧也掉血了
@@ -97,8 +103,8 @@ namespace LBuffMod.Common.GlobalNPCs
                 {
                     npc.lifeRegen = 0;
                 }
-                npc.lifeRegen += LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
-                damage -= LBuffUtils.BuffIDToLifeRegen(BuffID.Burning);
+                npc.lifeRegen += BuffIDToLifeRegen(BuffID.Burning);
+                damage -= BuffIDToLifeRegen(BuffID.Burning);
                 if (Main.rand.NextBool(3))
                 {
                     Dust dust = Dust.NewDustDirect(npc.TopLeft, npc.width, npc.height, DustID.SolarFlare, npc.velocity.X * 0.1f, npc.velocity.Y * 0.1f, 128);
@@ -119,28 +125,28 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void ModifyHitByItem(NPC npc, Player player, Item item, ref int damage, ref float knockback, ref bool crit)
         {
-            for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
+            for (int i = 0; i < thermalDebuffs.Length; i++)
             {
-                int buffIndex = npc.FindBuffIndex(LBuffUtils.thermalDebuffs[i]);
+                int buffIndex = npc.FindBuffIndex(thermalDebuffs[i]);
                 if (buffIndex != -1)//有火系debuff则获得额外的被暴击率
                 {
                     if (!crit && item.DamageType != DamageClass.Summon)
                     {
-                        int c = (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) * 0.6f);
+                        int c = (int)(-BuffIDToLifeRegen(thermalDebuffs[i]) * 0.6f);
                         crit = Main.rand.Next(100) < c ? true : false;
                     }
                 }
             }
-            for (int i = 0; i < LBuffUtils.poisonousDebuffs.Length; i++)
+            for (int i = 0; i < poisonousDebuffs.Length; i++)
             {
-                int buffIndex = npc.FindBuffIndex(LBuffUtils.poisonousDebuffs[i]);
+                int buffIndex = npc.FindBuffIndex(poisonousDebuffs[i]);
                 if (buffIndex != -1)
                 {
-                    if (crit && npc.buffTime[buffIndex] >= 1800)//超过30秒时暴击则按系数*时长增伤，时长减少至1/4
+                    if (crit && npc.buffTime[buffIndex] >= 1800)//超过30秒时暴击则按系数*时长增伤，时长减少至1/5
                     {
-                        damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 60f, npc.buffTime[buffIndex] / 43200));
-                        damage = (int)Math.Pow(damage, 7 / 5);
-                        npc.buffTime[buffIndex] /= 4;
+                        damage += (int)(-BuffIDToLifeRegen(poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 6f, npc.buffTime[buffIndex] / 43200f));
+                        damage = (int)Math.Pow(damage, 9d / 8d);
+                        npc.buffTime[buffIndex] = (int)(npc.buffTime[buffIndex] * 0.2f);
                     }
                 }
             }
@@ -148,41 +154,42 @@ namespace LBuffMod.Common.GlobalNPCs
             if (npc.HasBuff(BuffID.Bleeding))
             {
                 int buffTime = npc.FindBuffIndex(BuffID.Bleeding);
-                damage += (int)(damage * MathHelper.Lerp(0.05f, 0.5f, buffTime / 43200));
+                damage += (int)(damage * MathHelper.Lerp(0.05f, 0.5f, buffTime / 43200f));
             }
         }
         public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
+            for (int i = 0; i < thermalDebuffs.Length; i++)
             {
-                int buffIndex = npc.FindBuffIndex(LBuffUtils.thermalDebuffs[i]);
+                int buffIndex = npc.FindBuffIndex(thermalDebuffs[i]);
                 if (buffIndex != -1)
                 {
-                    if (!crit && !projectile.minion && projectile.DamageType != DamageClass.Summon)
+                    if (!crit && !projectile.minion && projectile.DamageType != DamageClass.Summon && projectile.DamageType != DamageClass.SummonMeleeSpeed)
                     {
-                        int c = (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) * 0.4f);//Lower add-crit chance
+                        int c = (int)(-BuffIDToLifeRegen(thermalDebuffs[i]) * 0.4f);//Lower add-crit chance
                         crit = Main.rand.Next(100) < c ? true : false;
                     }
                 }
             }
-            for (int i = 0; i < LBuffUtils.poisonousDebuffs.Length; i++)
+            for (int i = 0; i < poisonousDebuffs.Length; i++)
             {
-                int buffIndex = npc.FindBuffIndex(LBuffUtils.poisonousDebuffs[i]);
+                int buffIndex = npc.FindBuffIndex(poisonousDebuffs[i]);
                 if (buffIndex != -1)
                 {
-                    if (crit && npc.buffTime[buffIndex] >= 1800)//超过30秒时暴击则按系数*时长增伤，时长减少至1/4
+                    if (crit && npc.buffTime[buffIndex] >= 1800)//超过30秒时暴击则按系数*时长增伤，时长减少至1/5
                     {
-                        damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 60f, npc.buffTime[buffIndex] / 43200));
-                        damage = (int)Math.Pow(damage, 7 / 5);
-                        npc.buffTime[buffIndex] /= 4;
+                        damage += (int)(-BuffIDToLifeRegen(poisonousDebuffs[i]) * MathHelper.Lerp(0.6f, 6f, npc.buffTime[buffIndex] / 43200f));
+                        damage = (int)Math.Pow(damage, 9d / 8d);
+                        npc.buffTime[buffIndex] = (int)(npc.buffTime[buffIndex] * 0.2f);
                     }
                 }
             }
             //流血增伤
             if (npc.HasBuff(BuffID.Bleeding))
             {
-                int buffTime = npc.FindBuffIndex(BuffID.Bleeding);
-                damage += (int)(damage * MathHelper.Lerp(0.05f, 0.5f, buffTime / 43200));
+                int buffTime = npc.buffTime[npc.FindBuffIndex(BuffID.Bleeding)];
+                damage = (int)(damage * MathHelper.Lerp(1.05f, 1.5f, buffTime / 43200f));
+                //Main.NewText(damage);
             }
         }
         public override void PostAI(NPC npc)
@@ -192,26 +199,36 @@ namespace LBuffMod.Common.GlobalNPCs
                 npc.AddBuff(BuffID.Bleeding, 60);
                 //Main.NewText("GameUpdate: " + Main.GameUpdateCount % 60 + " buffTime: " + npc.buffTime[npc.FindBuffIndex(BuffID.Bleeding)] + " lifeRegen: " + npc.lifeRegen);
             }
-            //站在陨石、狱石、狱石砖上时施加灼烧
-            for (int i = 0; i < (int)(npc.width / 16f); i++)
+            int bleedingM = ContactTileNum(npc.position, npc.width, npc.height, TileID.EbonstoneBrick);
+            npc.AddBuff(BuffID.Bleeding, 4 * bleedingM);//尖刺上流血
+            /*if (Main.GameUpdateCount % 30 == 0)
             {
-                int bX = (int)npc.BottomLeft.X / 16 + i;
-                int bY = (int)npc.BottomLeft.Y / 16;
-                bX = Math.Clamp(bX, 0, Main.maxTilesX);
-                bY = Math.Clamp(bY, 0, Main.maxTilesY);
-                Tile tileSteppingOn = Main.tile[bX, bY];
-                if (tileSteppingOn.HasUnactuatedTile && Main.tileSolid[tileSteppingOn.TileType] && (tileSteppingOn.TileType == TileID.Meteorite || tileSteppingOn.TileType == TileID.Hellstone || tileSteppingOn.TileType == TileID.HellstoneBrick))
+                if (npc.FindBuffIndex(BuffID.Bleeding) != -1)
+                    Main.NewText($"{npc.buffTime[npc.FindBuffIndex(BuffID.Bleeding)]}  {bleedingM}");
+            }*/
+            //站在陨石、狱石、狱石砖上时施加灼烧
+            for (int i = 0; i < (int)(npc.width / 16f); ++i)
+            {
+                for (int j = 0; j < (int)(npc.height / 16f); j++)
                 {
-                    npc.AddBuff(BuffID.Burning, 60);//为什么每次update只+5？
+                    int bX = (int)npc.BottomLeft.X / 16 + i;
+                    int bY = (int)npc.BottomLeft.Y / 16 + j;
+                    bX = Math.Clamp(bX, 0, Main.maxTilesX);
+                    bY = Math.Clamp(bY, 0, Main.maxTilesY);
+                    Tile contactTile = Main.tile[bX, bY];
+                    if (contactTile.HasUnactuatedTile && Main.tileSolid[contactTile.TileType] && (contactTile.TileType == TileID.Meteorite || contactTile.TileType == TileID.Hellstone || contactTile.TileType == TileID.HellstoneBrick))
+                    {
+                        npc.AddBuff(BuffID.Burning, 60);//为什么每次update只+5？
+                    }
                 }
             }
-            int j = LBuffUtils.NPCBuffNumInBuffSet(npc, LBuffUtils.thermalDebuffs);
-            npc.position -= npc.velocity * 0.05f * j;//火焰减速
+            int k = NPCBuffNumInBuffSet(npc, thermalDebuffs);
+            npc.position -= npc.velocity * 0.05f * k;//火焰减速
             /*if (npc.type == NPCID.DD2EterniaCrystal)
             {
-                for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+                for (int i = 0; i < lDamagingDebuffs.Length; i++)
                 {
-                    npc.buffImmune[LBuffUtils.lDamagingDebuffs[i]] = true;
+                    npc.buffImmune[lDamagingDebuffs[i]] = true;
                 }
             }*/
         }

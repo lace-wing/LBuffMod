@@ -77,7 +77,8 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
         }
         public override void PostAI(Projectile projectile)
         {
-            if (projectile.type == ProjectileID.VolatileGelatinBall && projectile.friendly && (sourceIsNotNull ? sourceItem.type == ItemID.VolatileGelatin : false))//挥发明胶射弹修改
+            //挥发明胶射弹修改
+            if (projectile.type == ProjectileID.VolatileGelatinBall && projectile.friendly && (sourceIsNotNull ? sourceItem.type == ItemID.VolatileGelatin : false))
             {
                 if (projectile.scale > 1.5f)
                 {
@@ -90,11 +91,19 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
                 {
                     int hX = (int)(targetNPC.Center.X - projectile.Center.X);
                     int hY = (int)(targetNPC.Center.Y - projectile.Center.Y);
-                    Vector2 homingVelocity = new Vector2(hX * Main.rand.Next(1, 3), hY * Main.rand.Next(2, 6)) * 0.0006f;
+                    if (hX < 120 && hX > -120)
+                    {
+                        hX = hX > 0 ? 120 : -120;
+                    }
+                    if (hY < 120 && hY > -120)
+                    {
+                        hY = hY > 0 ? 120 : -120;
+                    }
+                    Vector2 homingVelocity = new Vector2(hX, hY) * MathHelper.Lerp(0.0003f, 0.0036f, new Vector2(hX, hY).Length() / 480f);
                     projectile.velocity += homingVelocity;
                     if (targetNPC.Center.Y < projectile.Center.Y)
                     {
-                        projectile.velocity.Y += hY * 0.0018f;
+                        projectile.velocity += homingVelocity * 0.0012f;
                     }
                 }
             }

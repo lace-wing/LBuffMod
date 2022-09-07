@@ -6,17 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 using LBuffMod.Content.Buffs;
 using Terraria.DataStructures;
+using static LBuffMod.Common.Utilities.LBuffUtils;
 
 namespace LBuffMod.Common.ModPlayers
 {
     public class LDebuffPlayer : ModPlayer
     {
         public bool royalGelOnFire;
-        public int royalGelFireDamage = -6;
-        public float royalGelFireDamageMultiplier = 0.9f;
+        public int royalGelFireDamage = -16;
+        public float royalGelFireDamageMultiplier = 0.7f;
         public bool volatileGelatinFire;
-        public int volatileGelatinFireDamage = -18;
-        public float volatileGelatinFireDamageMultiplier = 1.8f;
+        public int volatileGelatinFireDamage = -32;
+        public float volatileGelatinFireDamageMultiplier = 2.1f;
         public bool sharkToothNecklaceBleeding;
         public bool stingerNecklaceBleedingAndPoison;
         public bool madnessDebuff;
@@ -25,6 +26,8 @@ namespace LBuffMod.Common.ModPlayers
         public bool corruptionSetBonus;
         public bool crimsonSetBonus;
         public bool dryadsWardOnHit;
+        public int plrOnSpikesTimer = 0;
+        public int initialBleedingTime = 0;
         public override void ResetEffects()
         {
             royalGelOnFire = false;
@@ -37,6 +40,39 @@ namespace LBuffMod.Common.ModPlayers
             corruptionSetBonus = false;
             crimsonSetBonus = false;
             dryadsWardOnHit = false;
+        }
+        public override void PostUpdate()
+        {
+            Vector2 hurtTileV2 = Collision.HurtTiles(Player.position, Player.velocity, Player.width, Player.height);
+            int bleedingI = Player.FindBuffIndex(BuffID.Bleeding);
+            if (Main.GameUpdateCount % 60 == 0)
+            {
+                //Main.NewText($"{hurtTileV2} {initialBleedingTime} {bleedingI}");
+            }
+            if (hurtTileV2.Y == 60)
+            {
+                plrOnSpikesTimer++;
+                if (bleedingI != -1)
+                {
+                    Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] = 30 + initialBleedingTime;
+                }
+            }
+            if (hurtTileV2.Y != 60)
+            {
+                if (plrOnSpikesTimer > 0)
+                {
+                    Player.AddBuff(BuffID.Bleeding, (int)(plrOnSpikesTimer * 0.3f));
+                    plrOnSpikesTimer = 0;
+                }
+                if (bleedingI == -1)
+                {
+                    initialBleedingTime = 0;
+                }
+                if (bleedingI != -1)
+                {
+                    initialBleedingTime = Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)];
+                }
+            }
         }
         public override void UpdateEquips()
         {
@@ -211,18 +247,18 @@ namespace LBuffMod.Common.ModPlayers
         public override void UpdateBadLifeRegen()
         {
             //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
-            for (int i = 0; i < LBuffUtils.lDamagingDebuffs.Length; i++)
+            for (int i = 0; i < lDamagingDebuffs.Length; i++)
             {
-                int buffIndex = Player.FindBuffIndex(LBuffUtils.lDamagingDebuffs[i]);
+                int buffIndex = Player.FindBuffIndex(lDamagingDebuffs[i]);
                 if (buffIndex != -1)//TODO Balanced formula needed
                 {
-                    int additionalDamage = (int)(LBuffUtils.BuffIDToLifeRegen(LBuffUtils.lDamagingDebuffs[i]) * MathHelper.Lerp(-0.3f, 3f, Player.buffTime[buffIndex] / 6300f));
+                    int additionalDamage = (int)(BuffIDToLifeRegen(lDamagingDebuffs[i]) * MathHelper.Lerp(-0.3f, 2.1f, Player.buffTime[buffIndex] / 6300f));
                     Player.lifeRegen += additionalDamage;
-                    if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Electrified && madnessDebuff)
+                    if (lDamagingDebuffs[i] == BuffID.Electrified && madnessDebuff)
                     {
                         Player.lifeRegen -= additionalDamage;
                     }
-                    if (LBuffUtils.lDamagingDebuffs[i] == BuffID.Burning)//灼烧额外伤害-80%
+                    if (lDamagingDebuffs[i] == BuffID.Burning)//灼烧额外伤害-80%
                     {
                         Player.lifeRegen -= (int)(additionalDamage * 0.8f);
                     }
@@ -232,7 +268,7 @@ namespace LBuffMod.Common.ModPlayers
             //流血真的流血了
             if (Player.HasBuff(BuffID.Bleeding))
             {
-                Player.lifeRegen -= LBuffUtils.BuffIDToLifeRegen(BuffID.Bleeding);
+                Player.lifeRegen += BuffIDToLifeRegen(BuffID.Bleeding);
                 if (Player.lifeRegen > 0)
                 {
                     Player.lifeRegen = 0;
@@ -262,24 +298,24 @@ namespace LBuffMod.Common.ModPlayers
         }
         public override void ModifyHitByNPC(NPC npc, ref int damage, ref bool crit)
         {
-            for (int i = 0; i < LBuffUtils.damagingDebuffsToBuff.Length; i++)
+            for (int i = 0; i < damagingDebuffsToBuff.Length; i++)
             {
-                int buffIndex = Player.FindBuffIndex(LBuffUtils.damagingDebuffsToBuff[i]);
+                int buffIndex = Player.FindBuffIndex(damagingDebuffsToBuff[i]);
                 if (buffIndex != -1)
                 {
                     //弱debuff通用增伤
-                    damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 21600));
+                    damage += (int)(-BuffIDToLifeRegen(damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 21600));
                 }
             }
-            for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
+            for (int i = 0; i < thermalDebuffs.Length; i++)
             {
-                int buffIndex = Player.FindBuffIndex(LBuffUtils.damagingDebuffsToBuff[i]);
+                int buffIndex = Player.FindBuffIndex(damagingDebuffsToBuff[i]);
                 if (buffIndex != -1)
                 {
                     //火系debuff产生额外被暴击率
                     if (!crit)
                     {
-                        int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) / 4;
+                        int c = -BuffIDToLifeRegen(thermalDebuffs[i]) / 4;
                         crit = Main.rand.Next(1, 100) < c ? true : false;
                     }
                 }
@@ -319,24 +355,24 @@ namespace LBuffMod.Common.ModPlayers
         }
         public override void ModifyHitByProjectile(Projectile proj, ref int damage, ref bool crit)
         {
-            for (int i = 0; i < LBuffUtils.damagingDebuffsToBuff.Length; i++)
+            for (int i = 0; i < damagingDebuffsToBuff.Length; i++)
             {
-                int buffIndex = Player.FindBuffIndex(LBuffUtils.damagingDebuffsToBuff[i]);
+                int buffIndex = Player.FindBuffIndex(damagingDebuffsToBuff[i]);
                 if (buffIndex != -1)
                 {
                     //弱debuff通用增伤
-                    damage += (int)(-LBuffUtils.BuffIDToLifeRegen(LBuffUtils.damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 21600));
+                    damage += (int)(-BuffIDToLifeRegen(damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 21600));
                 }
             }
-            for (int i = 0; i < LBuffUtils.thermalDebuffs.Length; i++)
+            for (int i = 0; i < thermalDebuffs.Length; i++)
             {
-                int buffIndex = Player.FindBuffIndex(LBuffUtils.damagingDebuffsToBuff[i]);
+                int buffIndex = Player.FindBuffIndex(damagingDebuffsToBuff[i]);
                 if (buffIndex != -1)
                 {
                     //火系debuff产生额外被暴击率
                     if (!crit)
                     {
-                        int c = -LBuffUtils.BuffIDToLifeRegen(LBuffUtils.thermalDebuffs[i]) / 4;
+                        int c = -BuffIDToLifeRegen(thermalDebuffs[i]) / 4;
                         crit = Main.rand.Next(1, 100) < c ? true : false;
                     }
                 }
@@ -412,24 +448,24 @@ namespace LBuffMod.Common.ModPlayers
             //皇家凝胶施加着火
             if (royalGelOnFire && !target.friendly)
             {
-                target.AddBuff(BuffID.OnFire, 120);
+                target.AddBuff(BuffID.OnFire, 300);
             }
-            //挥发明胶施加霜火与涂油
+            //挥发明胶施加霜火
             if (volatileGelatinFire && !target.friendly)
             {
                 //target.AddBuff(BuffID.Oiled, 180);
-                target.AddBuff(BuffID.Frostburn, 180);
+                target.AddBuff(BuffID.Frostburn, 300);
             }
             //鲨牙项链施加流血
             if (sharkToothNecklaceBleeding && !target.friendly)
             {
-                target.AddBuff(BuffID.Bleeding, 120);
+                target.AddBuff(BuffID.Bleeding, 300);
             }
             //甜心项链施加流血和中毒
             if (stingerNecklaceBleedingAndPoison && !target.friendly)
             {
-                target.AddBuff(BuffID.Bleeding, 120);
-                target.AddBuff(BuffID.Poisoned, 60);
+                target.AddBuff(BuffID.Bleeding, 300);
+                target.AddBuff(BuffID.Poisoned,240);
             }
             //发电命中敌人对自己施加带电
             if (madnessDebuff && !target.friendly)
@@ -439,7 +475,7 @@ namespace LBuffMod.Common.ModPlayers
             //木套效果
             if (woodArmorSet && !target.friendly)
             {
-                target.AddBuff(BuffID.DryadsWardDebuff, 120);
+                target.AddBuff(BuffID.DryadsWardDebuff, 240);
             }
             //血腥套效果
             if (crimsonSetBonus && !target.friendly)
@@ -477,7 +513,7 @@ namespace LBuffMod.Common.ModPlayers
             //拜月邪教徒火球
             if (proj.type == ProjectileID.CultistBossFireBall && !target.friendly)
             {
-                target.AddBuff(BuffID.Burning, 45);
+                target.AddBuff(BuffID.Burning, 30);
                 if (target.life >= target.lifeMax * 0.7f)
                 {
                     damage = (int)(damage * 2.4f);
@@ -486,9 +522,10 @@ namespace LBuffMod.Common.ModPlayers
             //挥发明胶射弹
             if (proj.type == ProjectileID.VolatileGelatinBall && !target.friendly)
             {
-                damage += Math.Min(damage * 6, (int)(proj.damage * proj.scale * 0.3f));
-                proj.velocity *= 0.6f;
-                target.AddBuff(BuffID.Frostburn, (int)(120 * proj.scale));
+                damage = (int)(damage * 0.1f);
+                damage += Math.Min(damage * 3, (int)(proj.damage * proj.scale * 0.2f));
+                proj.velocity *= 0.7f;
+                target.AddBuff(BuffID.Frostburn, (int)(60 * proj.scale));
                 if (proj.scale < 6)
                 {
                     proj.scale += 0.5f;
@@ -496,7 +533,7 @@ namespace LBuffMod.Common.ModPlayers
                 //proj.extraUpdates += 1;
                 if (Main.rand.Next(7) >= 1)
                 {
-                    proj.penetrate += 3;
+                    proj.penetrate += 2;
                 }
                 if (Main.rand.NextBool(12 - (int)proj.scale) && proj.scale >= 3f && Main.myPlayer == Player.whoAmI && Main.myPlayer == proj.owner)
                 {
@@ -505,7 +542,7 @@ namespace LBuffMod.Common.ModPlayers
                     {
                         Vector2 velocity = (targetNPC.Center - proj.Center) * 0.12f * (i + 1);
                         Projectile extraVGProj = Projectile.NewProjectileDirect(proj.GetSource_FromThis(), proj.Center, velocity, ProjectileID.VolatileGelatinBall, (int)(damage * 0.6f), knockback, Player.whoAmI);
-                        extraVGProj.penetrate /= 2;
+                        extraVGProj.penetrate = (int)(proj.penetrate * 0.5f);
                         extraVGProj.scale = proj.scale * 0.5f;
                     }
                     proj.Kill();
@@ -514,24 +551,41 @@ namespace LBuffMod.Common.ModPlayers
             //皇家凝胶施加着火
             if (royalGelOnFire && !target.friendly)
             {
-                target.AddBuff(BuffID.OnFire, 60);
+                target.AddBuff(BuffID.OnFire, 90);
+                if (proj.DamageType == DamageClass.Melee || proj.DamageType == DamageClass.SummonMeleeSpeed)
+                {
+                    target.AddBuff(BuffID.OnFire, 90);
+                }
             }
-            //挥发明胶施加霜火与涂油
+            //挥发明胶施加霜火
             if (volatileGelatinFire && !target.friendly)
             {
                 //target.AddBuff(BuffID.Oiled, 90);
                 target.AddBuff(BuffID.Frostburn, 90);
+                if (proj.DamageType == DamageClass.Melee || proj.DamageType == DamageClass.SummonMeleeSpeed)
+                {
+                    target.AddBuff(BuffID.Frostburn, 180);
+                }
             }
             //鲨牙项链施加流血
             if (sharkToothNecklaceBleeding && !target.friendly)
             {
-                target.AddBuff(BuffID.Bleeding, 60);
+                target.AddBuff(BuffID.Bleeding, 90);
+                if (proj.DamageType == DamageClass.Melee || proj.DamageType == DamageClass.SummonMeleeSpeed)
+                {
+                    target.AddBuff(BuffID.Bleeding, 90);
+                }
             }
-            //甜心项链施加流血和中毒
+            //毒刺项链施加流血和中毒
             if (stingerNecklaceBleedingAndPoison && !target.friendly)
             {
-                target.AddBuff(BuffID.Bleeding, 60);
-                target.AddBuff(BuffID.Poisoned, 60);
+                target.AddBuff(BuffID.Bleeding, 90);
+                target.AddBuff(BuffID.Poisoned, 90);
+                if (proj.DamageType == DamageClass.Melee || proj.DamageType == DamageClass.SummonMeleeSpeed)
+                {
+                    target.AddBuff(BuffID.Bleeding, 90);
+                    target.AddBuff(BuffID.Poisoned, 60);
+                }
             }
             //发电命中敌人对自己施加带电
             if (madnessDebuff && !target.friendly)
@@ -541,7 +595,7 @@ namespace LBuffMod.Common.ModPlayers
             //木套效果
             if (woodArmorSet && !target.friendly)
             {
-                target.AddBuff(BuffID.DryadsWardDebuff, 60);
+                target.AddBuff(BuffID.DryadsWardDebuff, 90);
             }
             //血腥套效果
             if (crimsonSetBonus && !target.friendly)

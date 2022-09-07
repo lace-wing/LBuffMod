@@ -22,14 +22,14 @@ namespace LBuffMod.Common.GlobalItems
                 player.GetModPlayer<LDebuffPlayer>().sharkToothNecklaceBleeding = true;
                 player.GetDamage(DamageClass.Generic).Base -= 1;
             }
-            if (item.type == ItemID.SweetheartNecklace)
+            if (item.type == ItemID.StingerNecklace)
             {
                 player.GetModPlayer<LDebuffPlayer>().stingerNecklaceBleedingAndPoison = true;
                 player.GetDamage(DamageClass.Generic).Base -= 1;
             }
             if (item.type == ItemID.VolatileGelatin)
             {
-                player.GetDamage(DamageClass.Generic) -= 0.2f;
+                player.GetDamage(DamageClass.Generic) -= 0.3f;
                 player.GetModPlayer<LDebuffPlayer>().volatileGelatinFire = true;
             }
         }
