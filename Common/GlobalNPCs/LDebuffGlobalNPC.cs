@@ -96,9 +96,9 @@ namespace LBuffMod.Common.GlobalNPCs
                 {
                     damage -= BuffIDToLifeRegen(BuffID.Bleeding);
                 }
-                if (Main.rand.NextBool(3))
+                if (Main.rand.NextBool(2))
                 {
-                    Dust.NewDustDirect(npc.TopLeft, npc.width, npc.height, DustID.Blood, npc.velocity.X * 0.1f, npc.velocity.Y * 0.1f, 128);
+                    Dust.NewDustDirect(npc.TopLeft, npc.width, npc.height, DustID.Blood, npc.velocity.X * 0.1f, npc.velocity.Y * 0.1f, 32);
                 }
             }
             //灼烧也掉血了
@@ -206,19 +206,10 @@ namespace LBuffMod.Common.GlobalNPCs
                     fireSlowDownMultiplier = 0.08f;
                 }
             }
-            //给克脑上流血
-            if (npc.type == NPCID.BrainofCthulhu)
-            {
-                npc.AddBuff(BuffID.Bleeding, 60);
-            }
             //尖刺上流血
             int bleedingM = ContactTileNum(npc.position, npc.width, npc.height, TileID.EbonstoneBrick);
-            npc.AddBuff(BuffID.Bleeding, 4 * bleedingM);//尖刺上流血
-            if (Main.GameUpdateCount % 15 == 0)
-            {
-                if (npc.FindBuffIndex(BuffID.Bleeding) != -1)
-                    Main.NewText($"{npc.buffTime[npc.FindBuffIndex(BuffID.Bleeding)]}  {bleedingM}");
-            }
+            if (!npc.friendly)
+                npc.AddBuff(BuffID.Bleeding, 4 * bleedingM);//尖刺上流血
             //站在陨石、狱石、狱石砖上时施加灼烧
             for (int i = 0; i < (int)(npc.width / 16f); ++i)
             {

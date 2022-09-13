@@ -13,26 +13,25 @@ namespace LBuffMod.Common.Utilities
         public static int ContactTileNum(Vector2 position, int width, int height, int tileType = -1, int countActuated = 0, int[] tileShape = default)
         {
             int contactNum = 0;
-            int startTileX = (int)(position.X / 16f);
-            int startTileY = (int)(position.Y / 16f);
-            int widthTile = (int)(width / 16f);
-            int heightTile = (int)(height / 16f);
-            int boundaryX0 = startTileX - 1 >= 0 ? startTileX - 1 : 0;
-            int boundaryXMax = startTileX + widthTile + 2 <= Main.maxTilesX ? startTileX + widthTile + 2 : Main.maxTilesX;
-            int boundaryY0 = startTileY - 1 >= 0 ? startTileY - 1 : 0;
-            int boundaryYMax = startTileY + heightTile + 2 <= Main.maxTilesY ? startTileY + heightTile + 2 : Main.maxTilesY;
+            int startTileX = Math.Clamp((int)(position.X / 16f - 1), 0, Main.maxTilesX);
+            int startTileY = Math.Clamp((int)(position.Y / 16f - 1), 0, Main.maxTilesY);
+            int widthTile = Math.Clamp((int)(width / 16f + 3), 0, Main.maxTilesX);
+            int heightTile = Math.Clamp((int)(height / 16f + 3), 0, Main.maxTilesY);
 
             Vector2 tilePosition = default(Vector2);
-            for (int i = boundaryX0; i < boundaryXMax; i++)
+            for (int i = startTileX; i < startTileX + widthTile; i++)
             {
-                for (int j = boundaryY0; j < boundaryYMax; j++)
+                for (int j = startTileY; j < startTileY + heightTile; j++)
                 {
+                    /*Dust dust = Dust.NewDustDirect(new Vector2((i) * 16, (j) * 16), 16, 16, DustID.AncientLight, 0, 0);
+                    dust.velocity = Vector2.Zero;
+                    dust.noGravity = true;*/
                     Tile tile = Main.tile[i, j];
                     if (tile == null || (tileType != -1 && tile.TileType != tileType) || (countActuated == 0 && tile.IsActuated) || (countActuated == 2 && !tile.IsActuated))
                     {
                         continue;
                     }
-                    if (tileShape.Length > 0)
+                    if (tileShape != null)
                     {
                         int p = 0;
                         for (int s = 0; s < tileShape.Length; s++)
@@ -83,7 +82,7 @@ namespace LBuffMod.Common.Utilities
                     }
                     if (tile.Slope == SlopeType.Solid)//正常的
                     {
-                        if ((tilePosition.X < position.X + width && tilePosition.X + 16 >= position.X) && (tilePosition.Y + hBOffset <= position.Y + height && tilePosition.Y + 16 >= position.Y))
+                        if ((tilePosition.X <= position.X + width && tilePosition.X + 16 >= position.X) && (tilePosition.Y + hBOffset <= position.Y + height && tilePosition.Y + 16 >= position.Y - 0.01f))
                         {
                             contactNum++;
                         }
@@ -92,7 +91,7 @@ namespace LBuffMod.Common.Utilities
                     {
                         float OffsetX = Math.Clamp(position.Y - tilePosition.Y, 0, 16);
                         float OffsetY = Math.Clamp(position.X - tilePosition.X, 0, 16);
-                        if ((tilePosition.X + OffsetX <= position.X + width && tilePosition.X + 16 >= position.X) && (tilePosition.Y <= position.Y + height && tilePosition.Y + OffsetY >= position.Y))
+                        if ((tilePosition.X + OffsetX <= position.X + width && tilePosition.X + 16 >= position.X) && (tilePosition.Y <= position.Y + height && tilePosition.Y + OffsetY >= position.Y - 0.01f))
                         {
                             contactNum++;
                         }
@@ -101,7 +100,7 @@ namespace LBuffMod.Common.Utilities
                     {
                         float OffsetX = 16 - Math.Clamp(position.Y - tilePosition.Y, 0, 16);
                         float OffsetY = 16 - Math.Clamp(position.X - tilePosition.X, 0, 16);
-                        if ((tilePosition.X <= position.X + width && tilePosition.X + OffsetX >= position.X) && (tilePosition.Y <= position.Y + height && tilePosition.Y + OffsetY >= position.Y))
+                        if ((tilePosition.X <= position.X + width && tilePosition.X + OffsetX >= position.X) && (tilePosition.Y <= position.Y + height && tilePosition.Y + OffsetY >= position.Y - 0.01f))
                         {
                             contactNum++;
                         }
@@ -110,7 +109,7 @@ namespace LBuffMod.Common.Utilities
                     {
                         float OffsetX = 16 - Math.Clamp(position.Y - tilePosition.Y, 0, 16);
                         float OffsetY = 16 - Math.Clamp(position.X - tilePosition.X, 0, 16);
-                        if ((tilePosition.X + OffsetX <= position.X + width && tilePosition.X + 16 >= position.X) && (tilePosition.Y + OffsetY <= position.Y + height && tilePosition.Y + 16 >= position.Y))
+                        if ((tilePosition.X + OffsetX <= position.X + width && tilePosition.X + 16 >= position.X) && (tilePosition.Y + OffsetY <= position.Y + height && tilePosition.Y + 16 >= position.Y - 0.01f))
                         {
                             contactNum++;
                         }
@@ -119,7 +118,7 @@ namespace LBuffMod.Common.Utilities
                     {
                         float OffsetX = Math.Clamp(position.Y - tilePosition.Y, 0, 16);
                         float OffsetY = Math.Clamp(position.X - tilePosition.X, 0, 16);
-                        if ((tilePosition.X <= position.X + width && tilePosition.X + OffsetX >= position.X) && (tilePosition.Y + OffsetY <= position.Y + height && tilePosition.Y + 16 >= position.Y))
+                        if ((tilePosition.X <= position.X + width && tilePosition.X + OffsetX >= position.X) && (tilePosition.Y + OffsetY <= position.Y + height && tilePosition.Y + 16 >= position.Y - 0.01f))
                         {
                             contactNum++;
                         }

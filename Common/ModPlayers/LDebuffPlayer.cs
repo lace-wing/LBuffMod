@@ -53,10 +53,10 @@ namespace LBuffMod.Common.ModPlayers
         public override void PostUpdate()
         {
             //test
-            int x = ContactTileNum(Player.position, Player.width, Player.height, TileID.AmberStoneBlock);
-            if (Main.GameUpdateCount % 30 == 0)
+            int x = ContactTileNum(Player.TopLeft, Player.width, Player.height, TileID.EbonstoneBrick);
+            if (Main.GameUpdateCount % 60 == 0 && x > 0)
             {
-                Main.NewText($"The player is touching {x} AmberStoneBlock(s)");
+                Main.NewText($"{Player.name} is touching {x} EbonstoneBrick(s)");
             }
             //尖刺流血
             Vector2 hurtTileV2 = Collision.HurtTiles(Player.position, Player.velocity, Player.width, Player.height);
