@@ -14,6 +14,8 @@ namespace LBuffMod.Common.GlobalNPCs
     {
         public override bool InstancePerEntity => true;
 
+        public float fireSlowDownMultiplier = 0.04f;
+
         public bool royalGelNearby = false;
         public int totalRoyalGelFireDamage = 0;
         public float totalRoyalGelFireDamageMultiplier = 1;
@@ -80,7 +82,6 @@ namespace LBuffMod.Common.GlobalNPCs
                     }
                     npc.lifeRegen += additionalDamage;
                     damage -= additionalDamage / 2;
-                    //Main.NewText("buffTime: " + npc.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage + " lifeRegen: " + npc.lifeRegen + " totalRGD: " + totalVolatileGelatinFireDamage);
                 }
             }
             //流血真的流血了
@@ -95,6 +96,10 @@ namespace LBuffMod.Common.GlobalNPCs
                 {
                     damage -= BuffIDToLifeRegen(BuffID.Bleeding);
                 }
+                if (Main.rand.NextBool(3))
+                {
+                    Dust.NewDustDirect(npc.TopLeft, npc.width, npc.height, DustID.Blood, npc.velocity.X * 0.1f, npc.velocity.Y * 0.1f, 128);
+                }
             }
             //灼烧也掉血了
             if (npc.HasBuff(BuffID.Burning))
@@ -108,7 +113,6 @@ namespace LBuffMod.Common.GlobalNPCs
                 if (Main.rand.NextBool(3))
                 {
                     Dust dust = Dust.NewDustDirect(npc.TopLeft, npc.width, npc.height, DustID.SolarFlare, npc.velocity.X * 0.1f, npc.velocity.Y * 0.1f, 128);
-                    //dust.
                 }
             }
             //带电真的根据速度掉血了
@@ -194,18 +198,27 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void PostAI(NPC npc)
         {
+            //检测火焰减速
+            for (int i = 0; i < Main.player.Length; i++)
+            {
+                if (Main.player[i].active && Main.player[i].GetModPlayer<LDebuffPlayer>().fireSlowDown && Vector2.Distance(npc.Center, Main.player[i].Center) < 640)
+                {
+                    fireSlowDownMultiplier = 0.08f;
+                }
+            }
+            //给克脑上流血
             if (npc.type == NPCID.BrainofCthulhu)
             {
                 npc.AddBuff(BuffID.Bleeding, 60);
-                //Main.NewText("GameUpdate: " + Main.GameUpdateCount % 60 + " buffTime: " + npc.buffTime[npc.FindBuffIndex(BuffID.Bleeding)] + " lifeRegen: " + npc.lifeRegen);
             }
+            //尖刺上流血
             int bleedingM = ContactTileNum(npc.position, npc.width, npc.height, TileID.EbonstoneBrick);
             npc.AddBuff(BuffID.Bleeding, 4 * bleedingM);//尖刺上流血
-            /*if (Main.GameUpdateCount % 30 == 0)
+            if (Main.GameUpdateCount % 15 == 0)
             {
                 if (npc.FindBuffIndex(BuffID.Bleeding) != -1)
                     Main.NewText($"{npc.buffTime[npc.FindBuffIndex(BuffID.Bleeding)]}  {bleedingM}");
-            }*/
+            }
             //站在陨石、狱石、狱石砖上时施加灼烧
             for (int i = 0; i < (int)(npc.width / 16f); ++i)
             {
@@ -223,14 +236,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 }
             }
             int k = NPCBuffNumInBuffSet(npc, thermalDebuffs);
-            npc.position -= npc.velocity * 0.05f * k;//火焰减速
-            /*if (npc.type == NPCID.DD2EterniaCrystal)
-            {
-                for (int i = 0; i < lDamagingDebuffs.Length; i++)
-                {
-                    npc.buffImmune[lDamagingDebuffs[i]] = true;
-                }
-            }*/
+            npc.position -= npc.velocity * fireSlowDownMultiplier * k;//火焰减速
         }
         public override void OnHitPlayer(NPC npc, Player target, int damage, bool crit)
         {
@@ -297,13 +303,6 @@ namespace LBuffMod.Common.GlobalNPCs
             }
             #endregion
             //TODO More NPCs to inflict debuffs!!!
-        }
-        public override void OnHitByProjectile(NPC npc, Projectile projectile, int damage, float knockback, bool crit)
-        {
-            if (npc.type == NPCID.DD2EterniaCrystal)
-            {
-                //Main.NewText("HP: " + npc.life + "  lifeRegen: " + npc.lifeRegen + "\ntype: " + projectile.type + " damage: " + damage + " owner: " + projectile.owner);
-            }
         }
     }
 }

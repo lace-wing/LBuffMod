@@ -14,7 +14,7 @@ namespace LBuffMod.Common.GlobalItems
         {
             if (item.type == ItemID.RoyalGel)
             {
-                player.GetDamage(DamageClass.Generic) -= 0.2f;
+                player.GetDamage(DamageClass.Generic) -= 0.1f;
                 player.GetModPlayer<LDebuffPlayer>().royalGelOnFire = true;
             }
             if (item.type == ItemID.SharkToothNecklace)
@@ -29,7 +29,7 @@ namespace LBuffMod.Common.GlobalItems
             }
             if (item.type == ItemID.VolatileGelatin)
             {
-                player.GetDamage(DamageClass.Generic) -= 0.3f;
+                player.GetDamage(DamageClass.Generic) -= 0.15f;
                 player.GetModPlayer<LDebuffPlayer>().volatileGelatinFire = true;
             }
         }

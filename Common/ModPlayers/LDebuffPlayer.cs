@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using LBuffMod.Content.Buffs;
 using Terraria.DataStructures;
 using static LBuffMod.Common.Utilities.LBuffUtils;
+using static LBuffMod.Common.Utilities.LCollisionUtils;
 
 namespace LBuffMod.Common.ModPlayers
 {
@@ -15,17 +16,24 @@ namespace LBuffMod.Common.ModPlayers
         public bool royalGelOnFire;
         public int royalGelFireDamage = -16;
         public float royalGelFireDamageMultiplier = 0.7f;
+
         public bool volatileGelatinFire;
         public int volatileGelatinFireDamage = -32;
         public float volatileGelatinFireDamageMultiplier = 2.1f;
+
+        public bool fireSlowDown;
+
         public bool sharkToothNecklaceBleeding;
         public bool stingerNecklaceBleedingAndPoison;
         public bool madnessDebuff;
         public bool hairdressersWhiteSilkStockings;
+
         public bool woodArmorSet;
         public bool corruptionSetBonus;
         public bool crimsonSetBonus;
+
         public bool dryadsWardOnHit;
+
         public int plrOnSpikesTimer = 0;
         public int initialBleedingTime = 0;
         public override void ResetEffects()
@@ -40,15 +48,20 @@ namespace LBuffMod.Common.ModPlayers
             corruptionSetBonus = false;
             crimsonSetBonus = false;
             dryadsWardOnHit = false;
+            fireSlowDown = false;
         }
         public override void PostUpdate()
         {
+            //test
+            int x = ContactTileNum(Player.position, Player.width, Player.height, TileID.AmberStoneBlock);
+            if (Main.GameUpdateCount % 30 == 0)
+            {
+                Main.NewText($"The player is touching {x} AmberStoneBlock(s)");
+            }
+            //尖刺流血
             Vector2 hurtTileV2 = Collision.HurtTiles(Player.position, Player.velocity, Player.width, Player.height);
             int bleedingI = Player.FindBuffIndex(BuffID.Bleeding);
             if (Main.GameUpdateCount % 60 == 0)
-            {
-                //Main.NewText($"{hurtTileV2} {initialBleedingTime} {bleedingI}");
-            }
             if (hurtTileV2.Y == 60)
             {
                 plrOnSpikesTimer++;
@@ -287,7 +300,7 @@ namespace LBuffMod.Common.ModPlayers
                     Player.lifeRegen -= f;
                     if (madnessDebuff && f > 0)
                     {
-                        Player.lifeRegen += f / 2;
+                        Player.lifeRegen += (int)(f / 2f);
                     }
                 }
                 if (madnessDebuff)
@@ -304,7 +317,7 @@ namespace LBuffMod.Common.ModPlayers
                 if (buffIndex != -1)
                 {
                     //弱debuff通用增伤
-                    damage += (int)(-BuffIDToLifeRegen(damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 21600));
+                    damage += (int)(-BuffIDToLifeRegen(damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 21600f));
                 }
             }
             for (int i = 0; i < thermalDebuffs.Length; i++)
@@ -315,7 +328,7 @@ namespace LBuffMod.Common.ModPlayers
                     //火系debuff产生额外被暴击率
                     if (!crit)
                     {
-                        int c = -BuffIDToLifeRegen(thermalDebuffs[i]) / 4;
+                        int c = (int)(-BuffIDToLifeRegen(thermalDebuffs[i]) / 4f);
                         crit = Main.rand.Next(1, 100) < c ? true : false;
                     }
                 }
@@ -324,7 +337,7 @@ namespace LBuffMod.Common.ModPlayers
             if (Player.HasBuff(BuffID.Bleeding))
             {
                 int buffTime = Player.FindBuffIndex(BuffID.Bleeding);
-                damage += (int)(damage * MathHelper.Lerp(0.1f, 0.5f, buffTime / 6300));
+                damage += (int)(damage * MathHelper.Lerp(0.1f, 0.5f, buffTime / 6300f));
             }
             //白丝发电
             if (hairdressersWhiteSilkStockings)
@@ -338,9 +351,9 @@ namespace LBuffMod.Common.ModPlayers
             //腐化套装效果
             if (corruptionSetBonus)
             {
-                for (int i = 1; i < 3; i++)
+                if (Main.myPlayer == Player.whoAmI)
                 {
-                    if (Main.myPlayer == Player.whoAmI)
+                    for (int i = 1; i < 3; i++)
                     {
                         Projectile.NewProjectileDirect(Player.GetSource_OnHurt(npc), Player.Center, (npc.Center - Player.Center) * i * 0.2f, ProjectileID.BallofFire, (int)(damage * 0.6f), 4f, Player.whoAmI);
                     }
@@ -351,6 +364,30 @@ namespace LBuffMod.Common.ModPlayers
             if (dryadsWardOnHit)
             {
                 Player.AddBuff(BuffID.DryadsWard, 180);
+            }
+            //皇家凝胶受击惩罚
+            if (royalGelOnFire)
+            {
+                if (damage < 1 || crit)
+                {
+                    Player.AddBuff(BuffID.OnFire, 90);
+                }
+                if (damage >= 1 && !crit)
+                {
+                    Player.AddBuff(BuffID.OnFire, Main.rand.Next(0, 60));
+                }
+            }
+            //挥发明胶受击惩罚
+            if (volatileGelatinFire)
+            {
+                if (damage < 1 || crit)
+                {
+                    Player.AddBuff(BuffID.Frostburn, 90);
+                }
+                if (damage >= 1 && !crit)
+                {
+                    Player.AddBuff(BuffID.Frostburn, Main.rand.Next(0, 60));
+                }
             }
         }
         public override void ModifyHitByProjectile(Projectile proj, ref int damage, ref bool crit)
@@ -407,6 +444,30 @@ namespace LBuffMod.Common.ModPlayers
             if (dryadsWardOnHit)
             {
                 Player.AddBuff(BuffID.DryadsWard, 180);
+            }
+            //皇家凝胶受击惩罚
+            if (royalGelOnFire)
+            {
+                if (damage < 1 || crit)
+                {
+                    Player.AddBuff(BuffID.OnFire, 90);
+                }
+                if (damage >= 1 && !crit)
+                {
+                    Player.AddBuff(BuffID.OnFire, Main.rand.Next(0, 60));
+                }
+            }
+            //挥发明胶受击惩罚
+            if (volatileGelatinFire)
+            {
+                if (damage < 1 || crit)
+                {
+                    Player.AddBuff(BuffID.Frostburn, 90);
+                }
+                if (damage >= 1 && !crit)
+                {
+                    Player.AddBuff(BuffID.Frostburn, Main.rand.Next(0, 60));
+                }
             }
         }
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit)
