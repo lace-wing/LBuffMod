@@ -10,7 +10,7 @@ namespace LBuffMod.Common.Utilities
     public class LCollisionUtils
     {
         //TODO Test this
-        public static int ContactTileNum(Vector2 position, int width, int height, int tileType, bool countActuated = false, int[] tileShape = default)
+        public static int ContactTileNum(Vector2 position, int width, int height, int tileType = -1, int countActuated = 0, int[] tileShape = default)
         {
             int contactNum = 0;
             int startTileX = (int)(position.X / 16f);
@@ -28,7 +28,7 @@ namespace LBuffMod.Common.Utilities
                 for (int j = boundaryY0; j < boundaryYMax; j++)
                 {
                     Tile tile = Main.tile[i, j];
-                    if (tile == null || tile.TileType != tileType ||(tile.IsActuated && !countActuated))
+                    if (tile == null || (tileType != -1 && tile.TileType != tileType) || (countActuated == 0 && tile.IsActuated) || (countActuated == 2 && !tile.IsActuated))
                     {
                         continue;
                     }
