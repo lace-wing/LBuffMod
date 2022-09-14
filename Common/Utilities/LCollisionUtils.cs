@@ -82,7 +82,8 @@ namespace LBuffMod.Common.Utilities
                     }
                     if (tile.Slope == SlopeType.Solid)//正常的
                     {
-                        if ((tilePosition.X <= position.X + width && tilePosition.X + 16 >= position.X) && (tilePosition.Y + hBOffset <= position.Y + height && tilePosition.Y + 16 >= position.Y - 0.01f))
+                        if (tilePosition.X <= position.X + width && tilePosition.X + 16 >= position.X
+                            && tilePosition.Y + hBOffset <= position.Y + height && tilePosition.Y + 16 >= position.Y - 0.01f)
                         {
                             contactNum++;
                         }
@@ -90,8 +91,9 @@ namespace LBuffMod.Common.Utilities
                     else if (tile.Slope == SlopeType.SlopeDownLeft)
                     {
                         float OffsetX = Math.Clamp(position.Y - tilePosition.Y, 0, 16);
-                        float OffsetY = Math.Clamp(position.X - tilePosition.X, 0, 16);
-                        if ((tilePosition.X + OffsetX <= position.X + width && tilePosition.X + 16 >= position.X) && (tilePosition.Y <= position.Y + height && tilePosition.Y + OffsetY >= position.Y - 0.01f))
+                        float OffsetY = Math.Clamp(position.X + width - tilePosition.X, 0, 16);
+                        if (tilePosition.X + OffsetX <= position.X + width && tilePosition.X + 16 >= position.X
+                            && tilePosition.Y <= position.Y + height && tilePosition.Y + OffsetY >= position.Y - 0.01f)
                         {
                             contactNum++;
                         }
@@ -100,25 +102,28 @@ namespace LBuffMod.Common.Utilities
                     {
                         float OffsetX = 16 - Math.Clamp(position.Y - tilePosition.Y, 0, 16);
                         float OffsetY = 16 - Math.Clamp(position.X - tilePosition.X, 0, 16);
-                        if ((tilePosition.X <= position.X + width && tilePosition.X + OffsetX >= position.X) && (tilePosition.Y <= position.Y + height && tilePosition.Y + OffsetY >= position.Y - 0.01f))
+                        if (tilePosition.X <= position.X + width && tilePosition.X + OffsetX >= position.X
+                            && tilePosition.Y <= position.Y + height && tilePosition.Y + OffsetY >= position.Y - 0.01f)
                         {
                             contactNum++;
                         }
                     }
                     else if (tile.Slope == SlopeType.SlopeUpLeft)
                     {
-                        float OffsetX = 16 - Math.Clamp(position.Y - tilePosition.Y, 0, 16);
-                        float OffsetY = 16 - Math.Clamp(position.X - tilePosition.X, 0, 16);
-                        if ((tilePosition.X + OffsetX <= position.X + width && tilePosition.X + 16 >= position.X) && (tilePosition.Y + OffsetY <= position.Y + height && tilePosition.Y + 16 >= position.Y - 0.01f))
+                        float OffsetX = 16 - Math.Clamp(position.Y + height - tilePosition.Y, 0, 16);
+                        float OffsetY = 16 - Math.Clamp(position.X + width - tilePosition.X, 0, 16);
+                        if (tilePosition.X + OffsetX <= position.X + width && tilePosition.X + 16 >= position.X
+                            && tilePosition.Y + OffsetY <= position.Y + height && tilePosition.Y + 16 >= position.Y - 0.01f)
                         {
                             contactNum++;
                         }
                     }
                     if (tile.Slope == SlopeType.SlopeUpRight)
                     {
-                        float OffsetX = Math.Clamp(position.Y - tilePosition.Y, 0, 16);
+                        float OffsetX = 16 - Math.Clamp(position.Y + height - tilePosition.Y, 0, 16);
                         float OffsetY = Math.Clamp(position.X - tilePosition.X, 0, 16);
-                        if ((tilePosition.X <= position.X + width && tilePosition.X + OffsetX >= position.X) && (tilePosition.Y + OffsetY <= position.Y + height && tilePosition.Y + 16 >= position.Y - 0.01f))
+                        if (tilePosition.X <= position.X + width && tilePosition.X + OffsetX >= position.X
+                            && tilePosition.Y + OffsetY <= position.Y + height && tilePosition.Y + 16 >= position.Y - 0.01f)
                         {
                             contactNum++;
                         }
