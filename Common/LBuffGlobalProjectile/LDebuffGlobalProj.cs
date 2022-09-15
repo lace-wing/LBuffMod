@@ -13,7 +13,7 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
         public override bool InstancePerEntity => true;
         public bool sourceIsNotNull;
         public NPC npc;
-        public Player player;
+        public Player sourcePlayer; //Use it to check a proj's real owner
         public Item sourceItem;
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {

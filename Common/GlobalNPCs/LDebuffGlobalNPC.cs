@@ -57,31 +57,34 @@ namespace LBuffMod.Common.GlobalNPCs
                 }
             }
             //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
-            for (int i = 0; i < lDamagingDebuffs.Length; i++)
+            if (npc.lifeRegen < 0)
             {
-                int buffIndex = npc.FindBuffIndex(lDamagingDebuffs[i]);
-                if (buffIndex != -1)//TODO Balanced formula needed
+                for (int i = 0; i < lDamagingDebuffs.Length; i++)
                 {
-                    int additionalDamage = (int)(BuffIDToLifeRegen(lDamagingDebuffs[i]) * MathHelper.Lerp(-0.3f, 2.1f, npc.buffTime[buffIndex] / 43200f));
+                    int buffIndex = npc.FindBuffIndex(lDamagingDebuffs[i]);
+                    if (buffIndex != -1)//TODO Balanced formula needed
+                    {
+                        int additionalDamage = (int)(BuffIDToLifeRegen(lDamagingDebuffs[i]) * MathHelper.Lerp(-0.3f, 2.1f, npc.buffTime[buffIndex] / 43200f));
 
-                    if (NPCHasTheBuffInBuffSet(npc, lDamagingDebuffs[i], normalFireDebuffs))//是常规火焰
-                    {
-                        if (royalGelNearby)//皇家凝胶常规火焰增伤
+                        if (NPCHasTheBuffInBuffSet(npc, lDamagingDebuffs[i], normalFireDebuffs))//是常规火焰
                         {
-                            additionalDamage += (int)(totalRoyalGelFireDamage * MathHelper.Lerp(0.3f, 3f, npc.buffTime[buffIndex] / 43200f));
-                            additionalDamage = (int)(additionalDamage * totalRoyalGelFireDamageMultiplier);
+                            if (royalGelNearby)//皇家凝胶常规火焰增伤
+                            {
+                                additionalDamage += (int)(totalRoyalGelFireDamage * MathHelper.Lerp(0.3f, 3f, npc.buffTime[buffIndex] / 43200f));
+                                additionalDamage = (int)(additionalDamage * totalRoyalGelFireDamageMultiplier);
+                            }
                         }
-                    }
-                    if (NPCHasTheBuffInBuffSet(npc, lDamagingDebuffs[i], normalFireDebuffs) || NPCHasTheBuffInBuffSet(npc, lDamagingDebuffs[i], frostFireDebuffs))//是常规火、霜火
-                    {
-                        if (volatilegeltinNearby)//挥发明胶火焰增伤
+                        if (NPCHasTheBuffInBuffSet(npc, lDamagingDebuffs[i], normalFireDebuffs) || NPCHasTheBuffInBuffSet(npc, lDamagingDebuffs[i], frostFireDebuffs))//是常规火、霜火
                         {
-                            additionalDamage += (int)(totalVolatileGelatinFireDamage * MathHelper.Lerp(0.3f, 3f, npc.buffTime[buffIndex] / 43200f));
-                            additionalDamage = (int)(additionalDamage * totalVolatileGelatinFireDamageMultiplier);
+                            if (volatilegeltinNearby)//挥发明胶火焰增伤
+                            {
+                                additionalDamage += (int)(totalVolatileGelatinFireDamage * MathHelper.Lerp(0.3f, 3f, npc.buffTime[buffIndex] / 43200f));
+                                additionalDamage = (int)(additionalDamage * totalVolatileGelatinFireDamageMultiplier);
+                            }
                         }
+                        npc.lifeRegen += additionalDamage;
+                        damage -= additionalDamage / 2;
                     }
-                    npc.lifeRegen += additionalDamage;
-                    damage -= additionalDamage / 2;
                 }
             }
             //流血真的流血了
@@ -198,6 +201,12 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void PostAI(NPC npc)
         {
+            //Test
+            int x = ContactTileNum(npc.position, npc.width, npc.height, new int[] { TileID.EbonstoneBrick });
+            if (x > 0 && Main.GameUpdateCount % 90 == 0)
+            {
+                Main.NewText($"{npc.FullName} is touching {x} brick(s)");
+            }
             //检测火焰减速
             for (int i = 0; i < Main.player.Length; i++)
             {
@@ -207,7 +216,7 @@ namespace LBuffMod.Common.GlobalNPCs
                 }
             }
             //尖刺上流血
-            int bleedingM = ContactTileNum(npc.position, npc.width, npc.height, TileID.EbonstoneBrick);
+            int bleedingM = ContactTileNum(npc.position, npc.width, npc.height, new int[] { TileID.EbonstoneBrick });
             if (!npc.friendly)
                 npc.AddBuff(BuffID.Bleeding, 4 * bleedingM);//尖刺上流血
             //站在陨石、狱石、狱石砖上时施加灼烧

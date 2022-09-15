@@ -34,8 +34,10 @@ namespace LBuffMod.Common.ModPlayers
 
         public bool dryadsWardOnHit;
 
+        int spikeNum = 0;
         public int plrOnSpikesTimer = 0;
         public int initialBleedingTime = 0;
+        int additionalBleedingTime = 0;
         public override void ResetEffects()
         {
             royalGelOnFire = false;
@@ -49,32 +51,35 @@ namespace LBuffMod.Common.ModPlayers
             crimsonSetBonus = false;
             dryadsWardOnHit = false;
             fireSlowDown = false;
+            spikeNum = 0;
         }
         public override void PostUpdate()
         {
             //test
-            int x = ContactTileNum(Player.TopLeft, Player.width, Player.height, TileID.EbonstoneBrick);
-            if (Main.GameUpdateCount % 60 == 0 && x > 0)
+            /*int x = ContactTileNum(Player.TopLeft, Player.width, Player.height, new int[] { TileID.EbonstoneBrick }, 0);
+            if (Main.GameUpdateCount % 60 == 0 && x >= 0)
             {
                 Main.NewText($"{Player.name} is touching {x} EbonstoneBrick(s)");
-            }
+            }*/
             //尖刺流血
-            Vector2 hurtTileV2 = Collision.HurtTiles(Player.position, Player.velocity, Player.width, Player.height);
+            spikeNum = ContactTileNum(Player.position, Player.width, Player.height, new int[] { TileID.Spikes, TileID.WoodenSpikes });
             int bleedingI = Player.FindBuffIndex(BuffID.Bleeding);
-            if (Main.GameUpdateCount % 60 == 0)
-            if (hurtTileV2.Y == 60)
+            additionalBleedingTime = Math.Clamp(additionalBleedingTime, -300, 1800);
+            if (spikeNum > 0)
             {
-                plrOnSpikesTimer++;
+                plrOnSpikesTimer += spikeNum;
+                additionalBleedingTime += (int)(Player.velocity.Length() * spikeNum);
                 if (bleedingI != -1)
                 {
-                    Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] = 30 + initialBleedingTime;
+                    Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)] = 60 + initialBleedingTime + additionalBleedingTime;
                 }
             }
-            if (hurtTileV2.Y != 60)
+            if (spikeNum == 0)
             {
+                additionalBleedingTime -= 1;
                 if (plrOnSpikesTimer > 0)
                 {
-                    Player.AddBuff(BuffID.Bleeding, (int)(plrOnSpikesTimer * 0.3f));
+                    Player.AddBuff(BuffID.Bleeding, (int)(plrOnSpikesTimer * 0.0f));
                     plrOnSpikesTimer = 0;
                 }
                 if (bleedingI == -1)
@@ -260,22 +265,25 @@ namespace LBuffMod.Common.ModPlayers
         public override void UpdateBadLifeRegen()
         {
             //全局：根据持续时间增加伤害：所有伤害性原版debuff + 流血
-            for (int i = 0; i < lDamagingDebuffs.Length; i++)
+            if (Player.lifeRegen < 0)
             {
-                int buffIndex = Player.FindBuffIndex(lDamagingDebuffs[i]);
-                if (buffIndex != -1)//TODO Balanced formula needed
+                for (int i = 0; i < lDamagingDebuffs.Length; i++)
                 {
-                    int additionalDamage = (int)(BuffIDToLifeRegen(lDamagingDebuffs[i]) * MathHelper.Lerp(-0.3f, 2.1f, Player.buffTime[buffIndex] / 6300f));
-                    Player.lifeRegen += additionalDamage;
-                    if (lDamagingDebuffs[i] == BuffID.Electrified && madnessDebuff)
+                    int buffIndex = Player.FindBuffIndex(lDamagingDebuffs[i]);
+                    if (buffIndex != -1)//TODO Balanced formula needed
                     {
-                        Player.lifeRegen -= additionalDamage;
+                        int additionalDamage = (int)(BuffIDToLifeRegen(lDamagingDebuffs[i]) * MathHelper.Lerp(-0.3f, 2.1f, Player.buffTime[buffIndex] / 6300f));
+                        Player.lifeRegen += additionalDamage;
+                        if (lDamagingDebuffs[i] == BuffID.Electrified && madnessDebuff)
+                        {
+                            Player.lifeRegen -= additionalDamage;
+                        }
+                        if (lDamagingDebuffs[i] == BuffID.Burning)//灼烧额外伤害-80%
+                        {
+                            Player.lifeRegen -= (int)(additionalDamage * 0.8f);
+                        }
+                        //Main.NewText("Player: buffTime: " + Player.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
                     }
-                    if (lDamagingDebuffs[i] == BuffID.Burning)//灼烧额外伤害-80%
-                    {
-                        Player.lifeRegen -= (int)(additionalDamage * 0.8f);
-                    }
-                    //Main.NewText("Player: buffTime: " + Player.buffTime[buffIndex] + " " + "Additional damage: " + additionalDamage);
                 }
             }
             //流血真的流血了
@@ -619,7 +627,7 @@ namespace LBuffMod.Common.ModPlayers
                 }
             }
             //挥发明胶施加霜火
-            if (volatileGelatinFire && !target.friendly)
+            if (volatileGelatinFire && !target.friendly && proj.owner == Main.myPlayer)
             {
                 //target.AddBuff(BuffID.Oiled, 90);
                 target.AddBuff(BuffID.Frostburn, 90);
