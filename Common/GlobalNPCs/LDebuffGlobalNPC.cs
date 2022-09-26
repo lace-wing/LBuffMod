@@ -25,6 +25,7 @@ namespace LBuffMod.Common.GlobalNPCs
         public float totalVolatileGelatinFireDamageMultiplier = 0;
 
         public int npcOnSpikesTimer = 0;
+        public int npcSpikeDamageCooldown = 0;
         public override void ResetEffects(NPC npc)
         {
             royalGelNearby = false;
@@ -129,6 +130,16 @@ namespace LBuffMod.Common.GlobalNPCs
                     Dust dust = Dust.NewDustDirect(npc.TopLeft, npc.width, npc.height, DustID.Electric, npc.velocity.X * 0.1f, npc.velocity.Y * 0.1f);
                 }
             }
+            #region Buff反应
+            //毒系debuff+树妖祸害
+            if (npc.HasBuff(BuffID.DryadsWardDebuff) && NPCHasBuffInBuffSet(npc, poisonousDebuffs))
+            {
+                if (npc.lifeRegen < 0)
+                {
+                    npc.lifeRegen += (int)(npc.lifeRegen * 0.5f);
+                }
+            }
+            #endregion
         }
         public override void ModifyHitByItem(NPC npc, Player player, Item item, ref int damage, ref float knockback, ref bool crit)
         {
@@ -201,12 +212,6 @@ namespace LBuffMod.Common.GlobalNPCs
         }
         public override void PostAI(NPC npc)
         {
-            //Test
-            int x = ContactTileNum(npc.position, npc.width, npc.height, new int[] { TileID.EbonstoneBrick });
-            if (x > 0 && Main.GameUpdateCount % 90 == 0)
-            {
-                Main.NewText($"{npc.FullName} is touching {x} brick(s)");
-            }
             //检测火焰减速
             for (int i = 0; i < Main.player.Length; i++)
             {
@@ -215,28 +220,32 @@ namespace LBuffMod.Common.GlobalNPCs
                     fireSlowDownMultiplier = 0.08f;
                 }
             }
-            //尖刺上流血
-            int bleedingM = ContactTileNum(npc.position, npc.width, npc.height, new int[] { TileID.EbonstoneBrick });
-            if (!npc.friendly)
-                npc.AddBuff(BuffID.Bleeding, 4 * bleedingM);//尖刺上流血
-            //站在陨石、狱石、狱石砖上时施加灼烧
-            for (int i = 0; i < (int)(npc.width / 16f); ++i)
+            //尖刺上流血和给伤害
+            if (npcSpikeDamageCooldown > 0)
             {
-                for (int j = 0; j < (int)(npc.height / 16f); j++)
+                npcSpikeDamageCooldown--;
+            }
+            int bleedingM = ContactTileNum(npc.position, npc.width, npc.height, new int[] { TileID.Spikes, TileID.WoodenSpikes });
+            if (bleedingM > 0)
+            {
+                npc.AddBuff(BuffID.Bleeding, 4 * bleedingM + (int)(npc.velocity.Length() * bleedingM * 16));//尖刺上流血
+                if (!npc.dontTakeDamage && !npc.dontTakeDamageFromHostiles && npcSpikeDamageCooldown <= 0)
                 {
-                    int bX = (int)npc.BottomLeft.X / 16 + i;
-                    int bY = (int)npc.BottomLeft.Y / 16 + j;
-                    bX = Math.Clamp(bX, 0, Main.maxTilesX);
-                    bY = Math.Clamp(bY, 0, Main.maxTilesY);
-                    Tile contactTile = Main.tile[bX, bY];
-                    if (contactTile.HasUnactuatedTile && Main.tileSolid[contactTile.TileType] && (contactTile.TileType == TileID.Meteorite || contactTile.TileType == TileID.Hellstone || contactTile.TileType == TileID.HellstoneBrick))
-                    {
-                        npc.AddBuff(BuffID.Burning, 60);//为什么每次update只+5？
-                    }
+                    npc.StrikeNPC((Main.hardMode ? 16 : 8) * bleedingM, 0, 0);
+                    npcSpikeDamageCooldown += 60;
                 }
             }
+            //站在陨石、狱石、狱石砖上时施加灼烧
+            int burningM = ContactTileNum(npc.position, npc.width, npc.height, new int[] { TileID.Meteorite, TileID.Hellstone, TileID.HellstoneBrick });
+            if (burningM > 0)
+            {
+                npc.AddBuff(BuffID.Burning, 2 * burningM);
+            }
             int k = NPCBuffNumInBuffSet(npc, thermalDebuffs);
-            npc.position -= npc.velocity * fireSlowDownMultiplier * k;//火焰减速
+            if (k > 0)
+            {
+                npc.position -= npc.velocity * fireSlowDownMultiplier * k;//火焰减速
+            }
         }
         public override void OnHitPlayer(NPC npc, Player target, int damage, bool crit)
         {

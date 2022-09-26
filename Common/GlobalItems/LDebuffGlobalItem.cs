@@ -57,7 +57,7 @@ namespace LBuffMod.Common.GlobalItems
             }
             if (item.type == ItemID.VolatileGelatin)
             {
-                tooltips.Add(new(Mod, "VolatileGelatinFireNOil", Language.GetTextValue("Mods.LBuffMod.TooltipLine.VolatileGelatinFireNOil")));
+                tooltips.Add(new(Mod, "VolatileGelatinFireNOil", Language.GetTextValue("Mods.LBuffMod.TooltipLine.VolatileGelatinFire")));
             }
             if (item.type == ItemID.SharkToothNecklace)
             {

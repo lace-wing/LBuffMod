@@ -11,74 +11,112 @@ namespace LBuffMod.Common.LBuffGlobalProjectile
     public class LDebuffGlobalProj : GlobalProjectile
     {
         public override bool InstancePerEntity => true;
-        public bool sourceIsNotNull;
-        public NPC npc;
+        public NPC sourceNPC;
         public Player sourcePlayer; //Use it to check a proj's real owner
         public Item sourceItem;
+        public Projectile sourceProjectile;
+
+        public NPC npcStriking;
+        public Player playerStriking;
+        public Item itemStriking;
+        public Projectile projectileStriking;
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
-            if (source is EntitySource_Parent)
+            if (source != null)
             {
-                EntitySource_Parent source_Parent = source as EntitySource_Parent;
-                if (source_Parent.Entity is NPC)
+                if (source is EntitySource_Parent)
                 {
-                    npc = (NPC)source_Parent.Entity;
-                    sourceIsNotNull = true;
+                    EntitySource_Parent source_Parent = source as EntitySource_Parent;
+                    if (source_Parent.Entity is NPC)
+                    {
+                        sourceNPC = (NPC)source_Parent.Entity;
+                    }
+                    if (source_Parent.Entity is Player)
+                    {
+                        sourcePlayer = (Player)source_Parent.Entity;
+                    }
                 }
-            }
-            if (source is EntitySource_ItemUse)
-            {
-                EntitySource_ItemUse source_ItemUse = source as EntitySource_ItemUse;
-                if (source_ItemUse.Item is Item)
+                if (source is EntitySource_ItemUse)
                 {
-                    sourceItem = (Item)source_ItemUse.Item;
-                    sourceIsNotNull = true;
+                    EntitySource_ItemUse source_ItemUse = source as EntitySource_ItemUse;
+                    if (source_ItemUse.Item is Item)
+                    {
+                        sourceItem = (Item)source_ItemUse.Item;
+                        sourcePlayer = Main.player[sourceItem.whoAmI];
+                        //Main.NewText($"{sourcePlayer.name} just used {sourceItem.Name} to swpan {projectile.Name}");
+                    }
+                }
+                if (source is EntitySource_ItemUse_WithAmmo)
+                {
+                    EntitySource_ItemUse_WithAmmo source_ItemUse_WithAmmo = source as EntitySource_ItemUse_WithAmmo;
+                    if (source_ItemUse_WithAmmo.Item is Item)
+                    {
+                        sourceItem = (Item)source_ItemUse_WithAmmo.Item;
+                        sourcePlayer = Main.player[sourceItem.whoAmI];
+                        //Main.NewText($"{sourcePlayer.name} just used {sourceItem.Name} to swpan {projectile.Name}");
+                    }
+                }
+                else if (source is EntitySource_OnHit) //TODO Not implement
+                {
+                    EntitySource_OnHit source_OnHit = source as EntitySource_OnHit;
+                    if (source_OnHit.EntityStriking is Player)
+                    {
+                        playerStriking = (Player)source_OnHit.EntityStriking;
+                    }
+                    else if (source_OnHit.EntityStriking is Item)
+                    {
+                        itemStriking = (Item)source_OnHit.EntityStriking;
+                        playerStriking = Main.player[sourceItem.whoAmI];
+                    }
+                    else if (source_OnHit.EntityStriking is Projectile)
+                    {
+                        projectileStriking = (Projectile)source_OnHit.EntityStriking;
+                    }
                 }
             }
         }
         public override void ModifyHitPlayer(Projectile projectile, Player target, ref int damage, ref bool crit)
         {
-            if (npc == null)
+            if (sourceNPC != null)
             {
-                return;
-            }
-            #region Pre-hard Mode projs inflicting damaging debuffs
-            //哥布林鲨、血鱿鱼、恐惧鹦鹉螺
-            if (npc.type == NPCID.GoblinShark || npc.type == NPCID.BloodSquid || npc.type == NPCID.BloodNautilus)
-            {
-                target.AddBuff(BuffID.Bleeding, 120);
-            }
-            //血肉墙、饿鬼、血蛭
-            if (npc.type == NPCID.TheHungry || npc.type == NPCID.TheHungryII || npc.type == NPCID.WallofFlesh || npc.type == NPCID.WallofFleshEye || npc.type == NPCID.LeechHead || npc.type == NPCID.LeechBody || npc.type == NPCID.LeechTail)
-            {
-                if (!Main.hardMode)
+                #region Pre-hard Mode projs inflicting damaging debuffs
+                //哥布林鲨、血鱿鱼、恐惧鹦鹉螺
+                if (sourceNPC.type == NPCID.GoblinShark || sourceNPC.type == NPCID.BloodSquid || sourceNPC.type == NPCID.BloodNautilus)
                 {
-                    target.AddBuff(BuffID.OnFire3, 48);
+                    target.AddBuff(BuffID.Bleeding, 120);
                 }
-                if (Main.hardMode)
+                //血肉墙、饿鬼、血蛭
+                if (sourceNPC.type == NPCID.TheHungry || sourceNPC.type == NPCID.TheHungryII || sourceNPC.type == NPCID.WallofFlesh || sourceNPC.type == NPCID.WallofFleshEye || sourceNPC.type == NPCID.LeechHead || sourceNPC.type == NPCID.LeechBody || sourceNPC.type == NPCID.LeechTail)
                 {
-                    target.AddBuff(BuffID.CursedInferno, 48);
+                    if (!Main.hardMode)
+                    {
+                        target.AddBuff(BuffID.OnFire3, 48);
+                    }
+                    if (Main.hardMode)
+                    {
+                        target.AddBuff(BuffID.CursedInferno, 48);
+                    }
                 }
+                #endregion
+                #region Hard mode projs inflicting damaging debuffs
+                //机械骷髅王、激光眼、毁灭者身体&尾
+                if (sourceNPC.type == NPCID.SkeletronPrime || sourceNPC.type == NPCID.PrimeCannon || sourceNPC.type == NPCID.PrimeLaser || sourceNPC.type == NPCID.PrimeSaw || sourceNPC.type == NPCID.PrimeVice || sourceNPC.type == NPCID.Retinazer || sourceNPC.type == NPCID.TheDestroyerBody || sourceNPC.type == NPCID.TheDestroyerTail)
+                {
+                    target.AddBuff(BuffID.OnFire, 48);
+                }
+                //魔焰眼、毁灭者头
+                if (sourceNPC.type == NPCID.Spazmatism || sourceNPC.type == NPCID.TheDestroyer)
+                {
+                    target.AddBuff(BuffID.OnFire, 96);
+                }
+                #endregion
             }
-            #endregion
-            #region Hard mode projs inflicting damaging debuffs
-            //机械骷髅王、激光眼、毁灭者身体&尾
-            if (npc.type == NPCID.SkeletronPrime || npc.type == NPCID.PrimeCannon || npc.type == NPCID.PrimeLaser || npc.type == NPCID.PrimeSaw || npc.type == NPCID.PrimeVice || npc.type == NPCID.Retinazer || npc.type == NPCID.TheDestroyerBody || npc.type == NPCID.TheDestroyerTail)
-            {
-                target.AddBuff(BuffID.OnFire, 48);
-            }
-            //魔焰眼、毁灭者头
-            if (npc.type == NPCID.Spazmatism || npc.type == NPCID.TheDestroyer)
-            {
-                target.AddBuff(BuffID.OnFire, 96);
-            }
-            #endregion
             //TODO More projs to inflict debuffs!!!
         }
         public override void PostAI(Projectile projectile)
         {
             //挥发明胶射弹修改
-            if (projectile.type == ProjectileID.VolatileGelatinBall && projectile.friendly && (sourceIsNotNull ? sourceItem.type == ItemID.VolatileGelatin : false))
+            if (projectile.type == ProjectileID.VolatileGelatinBall && projectile.friendly && (sourceItem != null ? sourceItem.type == ItemID.VolatileGelatin : false))
             {
                 if (projectile.scale > 1.5f)
                 {

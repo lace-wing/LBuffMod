@@ -4,7 +4,7 @@
 	{
 		ItemName:
 		{
-			AcidicSword : "酸性的剑"
+			AcidicSword : "泰拉瑞亚：酸性的剑"
 		}
 		TooltipLine:
 		{
@@ -15,7 +15,7 @@
 				你的攻击施加着火了！
 				附近的敌人受到的来自常规火焰的伤害增加
 				'''
-			VolatileGelatinFireNOil : 
+			VolatileGelatinFire : 
 				'''
 				降低15%伤害，受击时获得霜火
 				你的攻击施加霜火
@@ -51,7 +51,7 @@
 				攻击施加树妖祸害，时不时获得树妖庇护
 				受击时获得树妖庇护
 				移动速度+25%
-				免疫摔落伤害
+				获得拾心和宝藏磁铁效果
 				身处森林时移动速度+15%
 				'''
 			RichMahoganyHelmetTooltip : 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LBuffMod.Content.Buffs;
-using Terraria.DataStructures;
+using LBuffMod.Common.LBuffGlobalProjectile;
 using static LBuffMod.Common.Utilities.LBuffUtils;
 using static LBuffMod.Common.Utilities.LCollisionUtils;
 
@@ -55,16 +55,10 @@ namespace LBuffMod.Common.ModPlayers
         }
         public override void PostUpdate()
         {
-            //test
-            /*int x = ContactTileNum(Player.TopLeft, Player.width, Player.height, new int[] { TileID.EbonstoneBrick }, 0);
-            if (Main.GameUpdateCount % 60 == 0 && x >= 0)
-            {
-                Main.NewText($"{Player.name} is touching {x} EbonstoneBrick(s)");
-            }*/
-            //尖刺流血
+            #region 尖刺流血
             spikeNum = ContactTileNum(Player.position, Player.width, Player.height, new int[] { TileID.Spikes, TileID.WoodenSpikes });
             int bleedingI = Player.FindBuffIndex(BuffID.Bleeding);
-            additionalBleedingTime = Math.Clamp(additionalBleedingTime, -300, 1800);
+            additionalBleedingTime = Math.Clamp(additionalBleedingTime, -600, 1800);
             if (spikeNum > 0)
             {
                 plrOnSpikesTimer += spikeNum;
@@ -91,6 +85,11 @@ namespace LBuffMod.Common.ModPlayers
                     initialBleedingTime = Player.buffTime[Player.FindBuffIndex(BuffID.Bleeding)];
                 }
             }
+            if (Player.dead)
+            {
+                additionalBleedingTime = 0;
+            }
+            #endregion
         }
         public override void UpdateEquips()
         {
@@ -110,7 +109,7 @@ namespace LBuffMod.Common.ModPlayers
                 }
             }
             //TODO Balance needed
-            //木套效果
+            #region 木套一般效果
             if (Player.armor[0].type == ItemID.WoodHelmet && Player.armor[1].type == ItemID.WoodBreastplate && Player.armor[2].type == ItemID.WoodGreaves)
             {
                 woodArmorSet = true;
@@ -120,7 +119,8 @@ namespace LBuffMod.Common.ModPlayers
                     Player.AddBuff(BuffID.DryadsWard, 90);
                 }
                 Player.moveSpeed += 0.25f;
-                Player.noFallDmg = true;
+                Player.lifeMagnet = true;
+                Player.treasureMagnet = true;
                 if (Player.ZoneForest)
                 {
                     Player.moveSpeed += 0.15f;
@@ -257,6 +257,7 @@ namespace LBuffMod.Common.ModPlayers
                 Player.statDefense += 2;
                 Player.moveSpeed *= 1.1f;
             }
+            #endregion，
         }
         public override void PostUpdateEquips()
         {
@@ -325,7 +326,7 @@ namespace LBuffMod.Common.ModPlayers
                 if (buffIndex != -1)
                 {
                     //弱debuff通用增伤
-                    damage += (int)(-BuffIDToLifeRegen(damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.2f, 2f, Player.buffTime[buffIndex] / 21600f));
+                    damage += (int)(-BuffIDToLifeRegen(damagingDebuffsToBuff[i]) * MathHelper.Lerp(0.3f, 3f, Player.buffTime[buffIndex] / 21600f));
                 }
             }
             for (int i = 0; i < thermalDebuffs.Length; i++)
@@ -390,11 +391,11 @@ namespace LBuffMod.Common.ModPlayers
             {
                 if (damage < 1 || crit)
                 {
-                    Player.AddBuff(BuffID.Frostburn, 90);
+                    Player.AddBuff(BuffID.Frostburn, 120);
                 }
                 if (damage >= 1 && !crit)
                 {
-                    Player.AddBuff(BuffID.Frostburn, Main.rand.Next(0, 60));
+                    Player.AddBuff(BuffID.Frostburn, Main.rand.Next(0, 90));
                 }
             }
         }
@@ -470,11 +471,11 @@ namespace LBuffMod.Common.ModPlayers
             {
                 if (damage < 1 || crit)
                 {
-                    Player.AddBuff(BuffID.Frostburn, 90);
+                    Player.AddBuff(BuffID.Frostburn, 120);
                 }
                 if (damage >= 1 && !crit)
                 {
-                    Player.AddBuff(BuffID.Frostburn, Main.rand.Next(0, 60));
+                    Player.AddBuff(BuffID.Frostburn, Main.rand.Next(0, 90));
                 }
             }
         }
@@ -569,6 +570,7 @@ namespace LBuffMod.Common.ModPlayers
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
+            #region 武器
             //血箭、血蛙、血蝠、血雨
             if (proj.type == ProjectileID.BloodArrow || proj.type == ProjectileID.VampireFrog || proj.type == ProjectileID.BatOfLight || proj.type == ProjectileID.BloodRain)
             {
@@ -579,6 +581,7 @@ namespace LBuffMod.Common.ModPlayers
             {
                 target.AddBuff(BuffID.Bleeding, 720);
             }
+            #endregion
             //拜月邪教徒火球
             if (proj.type == ProjectileID.CultistBossFireBall && !target.friendly)
             {
@@ -588,19 +591,19 @@ namespace LBuffMod.Common.ModPlayers
                     damage = (int)(damage * 2.4f);
                 }
             }
+            #region 饰品
             //挥发明胶射弹
             if (proj.type == ProjectileID.VolatileGelatinBall && !target.friendly)
             {
-                damage = (int)(damage * 0.1f);
-                damage += Math.Min(damage * 3, (int)(proj.damage * proj.scale * 0.2f));
-                proj.velocity *= 0.7f;
+                damage = (int)(damage * 0.3f);
+                damage += Math.Min(damage * 3, (int)(proj.damage * proj.scale * 0.5f));
+                proj.velocity *= 0.66f;
                 target.AddBuff(BuffID.Frostburn, (int)(60 * proj.scale));
                 if (proj.scale < 6)
                 {
                     proj.scale += 0.5f;
                 }
-                //proj.extraUpdates += 1;
-                if (Main.rand.Next(7) >= 1)
+                if (Main.rand.Next(7) >= 2)
                 {
                     proj.penetrate += 2;
                 }
@@ -610,7 +613,7 @@ namespace LBuffMod.Common.ModPlayers
                     for (int i = 0; i < 2; i++)
                     {
                         Vector2 velocity = (targetNPC.Center - proj.Center) * 0.12f * (i + 1);
-                        Projectile extraVGProj = Projectile.NewProjectileDirect(proj.GetSource_FromThis(), proj.Center, velocity, ProjectileID.VolatileGelatinBall, (int)(damage * 0.6f), knockback, Player.whoAmI);
+                        Projectile extraVGProj = Projectile.NewProjectileDirect(proj.GetSource_FromThis(), proj.Center, velocity, ProjectileID.VolatileGelatinBall, (int)(damage * 0.75f), knockback, Player.whoAmI);
                         extraVGProj.penetrate = (int)(proj.penetrate * 0.5f);
                         extraVGProj.scale = proj.scale * 0.5f;
                     }
@@ -629,7 +632,6 @@ namespace LBuffMod.Common.ModPlayers
             //挥发明胶施加霜火
             if (volatileGelatinFire && !target.friendly && proj.owner == Main.myPlayer)
             {
-                //target.AddBuff(BuffID.Oiled, 90);
                 target.AddBuff(BuffID.Frostburn, 90);
                 if (proj.DamageType == DamageClass.Melee || proj.DamageType == DamageClass.SummonMeleeSpeed)
                 {
@@ -656,6 +658,7 @@ namespace LBuffMod.Common.ModPlayers
                     target.AddBuff(BuffID.Poisoned, 60);
                 }
             }
+            #endregion
             //发电命中敌人对自己施加带电
             if (madnessDebuff && !target.friendly)
             {
