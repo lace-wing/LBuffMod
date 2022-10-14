@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LBuffMod.Common.Utilities
 {
-    public class LMathUtils
+    public class LMathUtil
     {
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LBuffMod.Common.Utilities
 {
-    public static class LBuffUtils
+    public static class LBuffUtil
     {
         //所有原版伤害性debuff：着火了！、狱火、霜火、霜噬、诅咒焰、暗影焰、日耀、中毒、毒液、带电、穿刺、窒息、树妖祸、狂卷之舌、灼烧
         public static int[] vanillaDamagingDebuffs =

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static LBuffMod.Common.Utilities.LBuffUtils;
+using static LBuffMod.Common.Utilities.LBuffUtil;
 
 namespace LBuffMod.Common.GlobalBuffs
 {

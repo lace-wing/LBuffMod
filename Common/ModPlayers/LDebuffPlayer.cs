@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using LBuffMod.Content.Buffs;
 using LBuffMod.Common.LBuffGlobalProjectile;
-using static LBuffMod.Common.Utilities.LBuffUtils;
-using static LBuffMod.Common.Utilities.LCollisionUtils;
+using static LBuffMod.Common.Utilities.LBuffUtil;
+using static LBuffMod.Common.Utilities.LPhysicsUtil;
 
 namespace LBuffMod.Common.ModPlayers
 {

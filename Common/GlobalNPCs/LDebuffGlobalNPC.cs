@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using LBuffMod.Common.ModPlayers;
-using static LBuffMod.Common.Utilities.LBuffUtils;
-using static LBuffMod.Common.Utilities.LCollisionUtils;
+using static LBuffMod.Common.Utilities.LBuffUtil;
+using static LBuffMod.Common.Utilities.LPhysicsUtil;
 
 namespace LBuffMod.Common.GlobalNPCs
 {

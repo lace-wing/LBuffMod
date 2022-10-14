@@ -7,7 +7,7 @@ using Terraria.Localization;
 
 namespace LBuffMod.Common.Utilities
 {
-    public static class LLocalizationUtils
+    public static class LLocalizationUtil
     {
         public static string GetTranslationAsString(string key)
         {

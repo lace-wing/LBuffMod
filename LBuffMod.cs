@@ -4,7 +4,7 @@ global using Terraria.ID;
 using Terraria.Localization;
 using System.Globalization;
 using LBuffMod.Common.Utilities;
-using static LBuffMod.Common.Utilities.LLocalizationUtils;
+using static LBuffMod.Common.Utilities.LLocalizationUtil;
 
 namespace LBuffMod
 {
